@@ -1,0 +1,132 @@
+% !TEX encoding = UTF-8 Unicode
+\documentclass[11pt,a4paper]{report}		                                   
+
+\usepackage{graphicx}
+\usepackage{a4}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+
+\usepackage{wrapfig}  
+\usepackage{acronym}
+\usepackage{enumitem}
+\usepackage[ampersand]{easylist}
+
+\usepackage{listings}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{float}
+
+\usepackage{caption}
+\captionsetup{margin=8pt,font=footnotesize,format=hang}
+
+\usepackage{url}
+
+%Platzierung von Tabelle in Kapitel erzwingen 
+\usepackage[section]{placeins}
+
+%Tabellen
+\usepackage{booktabs}
+\usepackage[table,xcdraw]{xcolor}
+
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter} %Kapitelübergreifende Bildnummerierung
+\counterwithout{table}{chapter} %Kapitelübergreifende Tabellennummerierung
+
+%Listings
+\usepackage{listings} 
+\lstset{
+	  numbers=none,
+	  numberstyle=\tiny,
+	  numbersep=5pt,
+	  captionpos=b,
+	  showstringspaces=false,
+	  basicstyle=\footnotesize\ttfamily,
+	  numberbychapter=false%TODO
+	  }
+\lstset{language=Java}
+\renewcommand{\lstlistingname}{Auflistung}
+\renewcommand{\lstlistlistingname}{Auflistungen}
+ 
+%Baumstruktur
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes,positioning,shadows,trees}
+
+\tikzset{
+	basic/.style = {draw, text width=2m, drop shadow, font=\sffamily, rectangle},
+	root/.style = {basic, rounded corners=2pt, thin, align=center,
+		fill=green!30},
+	level 2/.style = {basic, rounded corners=6pt, thin,align=center, fill=green!60,
+		text width=8em},
+	level 3/.style = {basic, thin, align=left, fill=pink!60, text width=6.5em}
+}
+
+%Kapitelüberschriften
+ \usepackage{fancyhdr} %Fancy Header
+ \pagestyle{fancy}
+ \fancyhead{}  
+ \fancyhead[RE,RO]{\normalsize\sffamily \thechapter \ \leftmark} 
+\cfoot{ \thepage}
+ \renewcommand{\headrulewidth}{0pt}  
+ \renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+ 
+ % set colors for links and URLs
+ \usepackage[
+ colorlinks=true,
+ urlcolor=black,
+ linkcolor=black,
+ citecolor=black
+ ]{hyperref}
+ 
+%Fußnoten
+\usepackage{scrextend} %Formatierung der Fußnoteneinträge
+\deffootnote{1.5em}{1em}{ %Fußnoten Formatierung
+	\makebox[1.5em][l]{\thefootnotemark}} % [l]-->Links
+
+%handle subsections
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{3}
+
+% Literatur - Achtung alphadin file angepasst!
+\bibliographystyle{alphadin}
+
+
+
+
+%Eigene Commands, falls gewuenscht
+\newcommand{\umbruch}{\\ \noindent}		%Zeilenumbruch
+\newcommand{\absatz}{\\ \\ \noindent}	%Absatz ohne einrücken
+\newcommand{\extra}[1]{\emph{#1}} 		%Fremdworte, Englische Worte, ... kursiv
+
+\renewcommand\lstlistingname{Quelltext} % Change language of section name
+
+\newcommand{\thema}{Data Analytics}
+\newcommand{\untertitel}{Einführung in ESPER}
+\newcommand{\autoren}{Lukas Groß, Clemens Grabow}
+\newcommand{\abgabedatum}{19.07.2018}
+\newcommand{\arbeitsTyp}{Ausarbeitung}
+
+\begin{document}
+
+\include{front/cover}
+
+\pagenumbering{gobble}
+\tableofcontents
+	\thispagestyle{empty}
+\clearpage 
+\pagenumbering{arabic}
+
+% So werden Kapitel inkludiert
+% \include{chapters/chapterName}
+\include{chapters/einleitung}
+\include{chapters/grundlagen}
+\include{chapters/implementierung}
+
+
+
+\bibliography{bib/literatur_esper}
+\addcontentsline{toc}{chapter}{Literaturverzeichnis}
+
+\include{chapters/acro}
+
+\end{document}

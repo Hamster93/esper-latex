@@ -1,0 +1,32 @@
+% !TEX encoding = UTF-8 Unicode
+\chapter{Implementierung}
+
+In diesem Kapitel soll eine Umsetzung der EDA mithilfe der CEP-Engine Esper von Espertech beschrieben werden.
+Diese soll anhand von UML und/oder Cde-Besipielen erläutert werden.
+
+\section{Esper für CEP und  ESB}
+
+Esper stellt eine API zur Vefügung, welche für die Ereginisverarbeitung eingesetzt wird. Sie beinhaltet einen Enterprise Service Bus (ESB) für die Kommunikation innerhalb des Systems. Hierfür wird der Java Messaging Service (JMS) verwendet.
+
+\subsection{API Überblick}
+
+Der EPServicePriovider bildet die CEP-Engine ab. Hier werden die einzelnen Prozesse in form von Threads angestoßen.
+EPStatement repräsentiert die Regeln/Queries. Hierzu wird die Esper-eigene EQL verwendet.
+Mithilfe des UpdateListener werden die Listener auf die Eventobjekte gemappt. Zur Standardisierung werden Interfaces bei der Implementierung verwendet.
+
+\section{Architektur}
+
+EDA als Entwurfsstil für Softwareanwendungen mit CEP als Kernkomponente. EDA dient als Architekturstil der Softwareentwicklung, CEP stellt ein Vorgehen für die Eventverarbeitung dar und kann für eine EDA eingesetzt werden.
+
+\subsection{Datenstrom durch Events}
+
+Diez zur Interaktion verwendeten Daten werden durch Events abgebildet. Bei Esper können für die Umsetzung der Events beispielsweise, Key-Value-Maps, POJO's (Plain-Old-Java-Objekt), Beans, oder XML-Dokumente verwendet werden. \cite[13]{esperRef2016}	
+
+\subsection{Mustererkennung durch Queries}
+
+Zur Erkennung werden Regeln und Muster mithilfe der Event Processing Language(EPL) von Esper umgesetzt.
+
+\subsection{Verarbeitung durch Listener}
+
+Zur Verarbeitung registrieren sich die Subscriber, hier Listener, umgesetzt. Diese registrieren sich an dem entsprechenden Event Processing Agent und bekommen fort an Benachrichtigung über das Eintreffen bestimmter Events.
+
