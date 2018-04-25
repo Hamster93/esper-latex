@@ -1,18 +1,41 @@
 % !TEX encoding = UTF-8 Unicode
 \chapter{Konzepte}
 Die Konzepte welche Esper verwendet werdet, dienen dazu, den kompletten Ereignisfluss von der Aktion bis zur Verarbeitung und nachfolgenden Aktionen, abzubilden.
-Ereignisse werden dezentral gefeuert und sind klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Muster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. Im folgenden werden die eben erwähnten Komponenten näher erläutert.
+Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Muster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. Im folgenden werden die eben erwähnten Komponenten näher erläutert.
 
 \section{Statements}
 
-Statements dienen dazu...
+Statements dienen dazu Muster zu definieren, mit deren Hilfe die Event-Engine den Datenstrom analysiert. Hierzu existiert die \acf{EPL}, welche stark an den Syntax von SQL erinnert.
 
-\section{Patterns}
+\section{Select}
+
+Quelltext \ref{basic_select} zeigt ein einfaches Select-Statement. Resultierend hieraus, wird der \acf{EP} auf alle Ereignisse vom Typ \textit{Action} reagieren und diese bei Eintritt erfassen. Sie werden unverändert weitergegeben. Dieses Statement wird im dem Casino eingesetzt, um über sämtliche Züge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse feingranular untersuchen zu können, werden weitere Techniken benötigt, welche Beispielsweise nach Attributen filtern können.
+
+\begin{lstlisting}[caption={Statement Selektion}\label{basic_select},captionpos=t,language=SQL]
+select * from Action
+\end{lstlisting}
 
 \section{Filter}
 
+Die Filterfunktion ist eine geeignete Möglichkeit, die Selektion aus dem Ereignisfluss auf definierte Attribute zu beschränken. Wie das Beispiel in Quelltext \ref{filter_select} veranschaulicht, können, wie im SQL Syntax, Ereigniseigenschaften beschränkt werden.
+Es werden nur die Attribute \textit{playerName} und \textit{deck} der auftretenden Ereignisse vom Typ \textit{GameEnd} berücksichtigt und weiterverarbeitet.
+Das Casion benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen wird. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
+
+\begin{lstlisting}[caption={Statement mit Filter}\label{filter_select},captionpos=t,language=SQL]
+select playerName, deck from GameEnd
+\end{lstlisting}
+
 \section{Aggregation}
 
+Um zu erfahren, welcher Spieler wie oft gewonnen hat verwenden wir die Aggregationsfunktion \textit{count(playerName)}. Quelltext \ref{aggregation_select} zeigt das dazu passende Statement. Dies hat zur Folge, dass der Ereignisstrom die auftretenden Ereignisse vom Typ \textit{GameEvent} mit selbem Spieler-Namen zählt. Der errechnete Wert wird mithilfe von \textit{as wins} in eine neues Attribut mit Alias "wins" gespeichert. Weitere Aggregationsfunktionen wie \textit{sum()}, \textit{avg()}, usw. sind ebenso verfügbar.
+Im Casino fällt auf, dass sich die Ereignisse der Vortage 
+
+\begin{lstlisting}[caption={Statement mit Aggregation}\label{aggregation_select},captionpos=t,language=SQL]
+select playerName, count(playerName) as wins, deck from GameEnd
+\end{lstlisting}
+
 \section{Data-Windows}
+
+\section{Patterns}
 
 \section{Partitions}
