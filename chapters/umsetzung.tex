@@ -1,6 +1,6 @@
 % !TEX encoding = UTF-8 Unicode
 \chapter{Umsetzung}
-In diesem Kapitel wird beschrieben, wie
+In diesem Kapitel wird beschrieben, wie Esper installiert werden kann. Die in der Implementierung entwickelte Java-Anwendung, verwendet Esper im Kontext des Szenarios (siehe TODO) dieser Arbeit.
 \section{Installation}
 Für die Installation von Esper wird in dieser Ausarbeitung des Build-Tool \textbf{Apache Maven} verwendet. 
 Dieses ermöglicht das automatisierte Herunterladen der Esper-Engine. Hierzu wird eine Konfigurationsdatei für Maven benötigt, die sogenannte \textbf{pom.xml}. Nachfolgend wird diese für das Szenario dargestellt:
@@ -19,20 +19,19 @@ Dieses ermöglicht das automatisierte Herunterladen der Esper-Engine. Hierzu wir
      <artifactId>esper-sample</artifactId>
      <version>1.0-SNAPSHOT</version>
 
-     <properties>
-         <maven.compiler.source>1.8</maven.compiler.source>
-         <maven.compiler.target>1.8</maven.compiler.target>
-         <esper.version>7.1.0</esper.version>
-     </properties>
-
      <dependencies>
          <dependency>
              <groupId>com.espertech</groupId>
              <artifactId>esper</artifactId>
-             <version>${esper.version}</version>
+             <version>7.1.0</version>
          </dependency>
      </dependencies>
 </project>
 \end{lstlisting}
+
+Wichtig ist hierbei das XML-Element \textbf{<dependencies>} welche die Abhängigkeiten enthält. Diese werden automatisch heruntergeladen, sobald Maven ausgeführt wird. In der Beispiel-Konfiguration gibt es nur eine Abhängigkeit, die für Esper.
+
+Nach dem Download kann die Esper-Engine direkt bei der Entwicklung einer Java-Anwendung verwendet werden. Für andere Sprachen, sind unter Umständen Build-Tools zu verwenden, welche hier nicht beschrieben werden.
+
 
 \section{Implementierung}
