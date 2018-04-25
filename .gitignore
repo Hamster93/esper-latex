@@ -1,2 +1,5 @@
 .DS_Store
 DA_ESPER-Bericht.pdf
+*.aux
+*.log
+*.out
