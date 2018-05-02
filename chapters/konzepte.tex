@@ -68,7 +68,7 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	
 	\item Nachfolge-Operator:
 	Der Nachfolge-Operator \texttt{->} tritt ein wenn das davor, gefolgt vom danach definiertem Ereignis eintrifft. In Quellcode \ref{follow_pattern}  würden alle Endevents betrachtet, welche auf ein Aktionsevent folgen. Die Bedingung trifft zu, wenn der vorangegangene Zug ein Spielausstieg(\textit{action = "FOLD"}) war.
-	Wie im Quellcode zu erkennen ist, werden die Ereignisse in Variablen \textit{a, b} gespeichert(bspw. \textit{a=GameAction}). So können die Werte im nächsten Schritt weiterverwendet werden. Im Beispiel wird das Folgeevent (\textit{b=GameEnd(a.playerName != b.playerName)}) überprüfen ob der Spieler-Name ungleich dem vorherigen ist und im Erfolgsfall erfasst.
+	Wie im Quellcode zu erkennen ist, werden die Ereignisse in Variablen \textit{a, b} gespeichert(bspw. \textit{a=GameAction}). So können die Werte im nächsten Schritt weiterverwendet werden. Im Beispiel wird das Folgeevent (\textit{b=GameEnd(a.playerName != b.playerName)}) überprüfen ob der Spieler-Name ungleich dem vorherigen ist und im Erfolgsfall erfasst. Auf diese Art und Weise lassen ich komplexe bedingte Ereignismuster definieren.
 	
 	\begin{lstlisting}[caption={Pattern mit Follow-Operator }\label{follow_pattern},captionpos=t,language=SQL]
 	
@@ -77,9 +77,8 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	
 	\end{lstlisting}
 	
-	\item Zeitliche Oserver:
-	Weitere Bedingungen können nach der \texttt{where}-Klausel angegeben werden. Beispielsweise kann ein Timer, welcher den Ereignisstrom beschränkt, mit \texttt{timer:within} definiert werden.
-	\texttt{timer:interval}
+	\item Zeitliche Beobachter (engl. Observer):
+	Das letzte, wie zum Beispiel Zeit-Überwacher, können nach der \texttt{where}-Klausel angegeben werden. Beispielsweise kann ein Timer, welcher den Ereignisstrom beschränkt, mit \texttt{timer:within} definiert werden. Dieser kann mit \texttt{timer:interval}
 	\texttt{timer:at}
 \end{enumerate}
 
@@ -87,3 +86,4 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 \section{Partitions}
 
 \section{Kombinierte Statements}
+
