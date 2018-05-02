@@ -12,7 +12,9 @@ Statements dienen dazu Muster zu definieren, mit deren Hilfe die Event-Engine de
 Quelltext \ref{basic_select} zeigt ein einfaches Select-Statement. Resultierend hieraus, wird der \acf{EP} auf alle Ereignisse vom Typ \textit{Action} reagieren und diese bei Eintritt erfassen. Sie werden unverändert weitergegeben. Dieses Statement wird im dem Casino eingesetzt, um über sämtliche Züge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse detailliert untersuchen zu können, werden weitere Techniken benötigt, welche Beispielsweise nach Attributen filtern können.
 
 \begin{lstlisting}[caption={Statement Selektion}\label{basic_select},captionpos=t,language=SQL]
+
 select * from Action
+
 \end{lstlisting}
 
 \section{Filter}
@@ -22,16 +24,20 @@ Es werden nur die Attribute \textit{playerName} und \textit{deck} der auftretend
 Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen wird. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
 
 \begin{lstlisting}[caption={Statement mit Filter}\label{filter_select},captionpos=t,language=SQL]
+
 select playerName, deck from GameEnd
+
 \end{lstlisting}
 
 \section{Aggregation}
 
-Um zu erfahren, welcher Spieler wie oft gewonnen hat verwenden wir die Aggregationsfunktion \textit{count(playerName)}. Quelltext \ref{aggregation_select} zeigt das dazu passende Statement. Dies hat zur Folge, dass der Ereignisstrom die auftretenden Ereignisse vom Typ \textit{GameEvent} mit selbem Spieler-Namen zählt. Der errechnete Wert wird mithilfe von \textit{as wins} in eine neues Attribut mit Alias "wins" gespeichert. Weitere Aggregationsfunktionen wie \textit{sum()}, \textit{avg()}, usw. sind ebenso verfügbar.
-Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysierenden Daten befinden. Um nur die Daten des aktuellen Tages auswerten zu können, sind Beschränkungen auf Intervalle erforderlich.
+Um zu erfahren, welcher Spieler wie oft gewonnen hat wird die Aggregationsfunktion \textit{count(playerName)}. Quelltext \ref{aggregation_select} zeigt das dazu passende Statement. Dies hat zur Folge, dass der Ereignisstrom die auftretenden Ereignisse vom Typ \textit{GameEvent} mit selbem Spieler-Namen zählt. Der errechnete Wert wird mithilfe von \textit{as wins} in eine neues Attribut mit Alias "wins" gespeichert. Weitere Aggregationsfunktionen wie \textit{sum()}, \textit{avg()}, usw. sind ebenso verfügbar.
+Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysierenden Daten befinden. Um nur die Daten des aktuellen Tages auswerten zu können, sind Beschränkungen des auszuwertenden Ereignisstroms erforderlich. Die \acf{EPL} bietet hierfür sogenannte Data-Windows.
 
 \begin{lstlisting}[caption={Statement mit Aggregation}\label{aggregation_select},captionpos=t,language=SQL]
+
 select playerName, count(playerName) as wins, deck from GameEnd
+
 \end{lstlisting}
 
 \section{Data-Windows}
@@ -39,4 +45,46 @@ select playerName, count(playerName) as wins, deck from GameEnd
 
 \section{Patterns}
 
+Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogenannte Patterns dar. Events, welche den Bedingungen entsprechen werden erfasst. Hierbei kommen verschiedene Elemente bei der Pattern-Definition zum Einsatz.
+
+\begin{enumerate}
+	\item Kontrolloperator: \texttt{every} definiert die Erstellung eines Pattern und regelt die Abarbeitung. Es wird alle(eng. every) auf das Muster zutreffende Ereignisse erfasst. Ein simples Pattern, welches alle Ereignisse vom Typ \textit{GameEnd} erkennt, kann Quellcode \ref{basic_pattern} entnommen werden.
+	
+	\begin{lstlisting}[caption={Einfaches Pattern}\label{basic_pattern},captionpos=t,language=SQL]
+	
+	every GameEnd
+	
+	\end{lstlisting}
+	
+	\item Logische Operatoren: 
+	Das Pattern kann, wie in Quellcode \ref{logic_pattern} veranschaulicht, durch logische Operatoren wie \texttt{and, or , not} zusammengesetzt werden.
+	
+	\begin{lstlisting}[caption={Pattern mit logischen Operatoren}\label{logic_pattern},captionpos=t,language=SQL]
+	
+	every a=GameAction or b=GameEnd
+	
+	\end{lstlisting}
+	
+	\item Nachfolge-Operator:
+	Der Nachfolge-Operator \texttt{->} tritt ein wenn das davor, gefolgt vom danach definiertem Ereignis eintrifft.
+	
+	\begin{lstlisting}[caption={Pattern mit Follow-Operator }\label{follow_pattern},captionpos=t,language=SQL]
+	
+	every a=GameAction -> b=GameEnd(playerName=a.playerName, deck="ROYAL_FLUSH") 
+	
+	\end{lstlisting}
+	
+	\item Observer:
+	weiter ...
+\end{enumerate}
+
+
+
+Weitere Bedingungen können nach der \texttt{where}-Klausel angegeben werden. Beispielsweise kann ein Timer, welcher den Ereignisstrom beschränkt, mit \texttt{timer:within} definiert werden.
+\texttt{timer:interval}
+\texttt{timer:at}
+
+
 \section{Partitions}
+
+\section{Kombinierte Statements}
