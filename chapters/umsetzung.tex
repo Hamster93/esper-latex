@@ -41,3 +41,9 @@ Nach dem Download kann die Esper-Engine direkt bei der Entwicklung einer Java-An
 	\caption{Event Klassen des Szenarios}
 	\label{EventKlassen}
 \end{figure}
+Um das Szenario abzubilden werden verschiedene Event-Klassen benötigt. Mit diesem Begriff sind Klassen gemeint, die ein Event darstellen.
+Als gemeinsame Basis dient die Event-Klasse \textbf{BaseEvent} (Siehe Abbildung \ref{EventKlassen}). Dieses Event beinhaltet den Spieler-Namen und einen Zeitstempel. Diese beiden Felder werden in allen Events benötigt.
+
+Die Event-Klassen \textbf{GameStartEvent} und \textbf{GameEndEvent} bilden den Start und das Ende einer Poker-Partie ab. Zu Beginn (GameStartEvent) werden alle Spiel-Teilnehmer benötigt, gegen Ende (GameEndEvent) das Preisgeld und Kartendeck, welches gewonnen hat. Da beide Events von \textbf{BaseEvent} erben, besitzen sie automatisch auch einen Zeitstempel und den zugeordneten Spieler. Beim Spielstart ist der zugeordnete Spieler-Name, der Name des ersten Spielers.
+
+Im Laufe der Partie werden verschiedene Aktionen der Spieler durchgeführt. Diese sind durch die Event-Klasse \textbf{GameActionEvent} abgebildet. Das Event beinhaltet ein Feld für die Aktionsart (z.B. "rise", wenn ein Spieler erhöht hat).
