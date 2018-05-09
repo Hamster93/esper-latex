@@ -63,6 +63,14 @@ select playerName, count(playerName) as wins, deck from GameEndEvent
 	\label{LengthWindow}
 \end{figure}
 
+Mit dem \textbf{Length Window} können mehrere Events im Bezug zueinander betrachtet werden (Kausalität). Hierzu wird eine Länge angegeben (in der Abbildung wird die Länge 2 verwendet), welche angibt, wie viele Events zusätzlich zum aktuellen betrachtet werden sollen. In diesem Fall würde das aktuelle Event und das vorherige Event betrachtet werden. Die Art des Events wird im Statement angegeben. Für das obige Beispiel könnte dies folgendermaßen aussehen:
+
+\begin{lstlisting}[caption={Statement mit Length Window}\label{aggregation_select},captionpos=b,language=SQL]
+
+select * from GameActionEvent.win:length(2)
+
+\end{lstlisting}
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{images/data_window_length_batch.png}
