@@ -97,17 +97,17 @@ select * from GameActionEvent.win:length(2)
 Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogenannte Patterns dar. Events, welche den Bedingungen entsprechen werden erfasst. Hierbei kommen verschiedene Elemente bei der Pattern-Definition zum Einsatz.
 
 \begin{enumerate}
-	\item Kontrolloperator: \texttt{every} definiert die Erstellung eines Pattern und regelt die Abarbeitung. Es wird alle(eng. every) auf das Ereignismuster zutreffende Ereignisse erfasst. Ein simples Pattern, welches alle Ereignisse des eines Tages vom Typ \textit{GameActionEvent} erfasst, kann Quellcode \ref{basic_pattern} entnommen werden.
-	In der \texttt{where}-Klausel können weitere Bedingungen, ähnlich wie bei der Selektion, definiert werden.
+	\item \textbf{Kontrolloperator:} \texttt{every} definiert die Erstellung eines Pattern und regelt die Abarbeitung. Es wird alle(engl. every) auf das Ereignismuster zutreffende Ereignisse erfasst. Ein simples Pattern, welches alle Ereignisse des eines Tages vom Typ \texttt{GameActionEvent} erfasst, kann Quellcode \ref{basic_pattern} entnommen werden.
+	In der \texttt{where}-Klausel können wie bei der Selektion weitere Bedingungen, definiert werden.
 	
 	\begin{lstlisting}[caption={Einfaches Pattern mit Where-Klausel}\label{basic_pattern}, captionpos=b,language=SQL]
 	
-	every GameActionEvent where timer:within(28800 seconds)
+	every GameActionEvent
 	
 	\end{lstlisting}
 	
-	\item Logische Operatoren: 
-	Das Pattern kann, wie in Quellcode \ref{logic_pattern} veranschaulicht, durch logische Operatoren wie \texttt{and, or , not} zusammengesetzt werden. So kann wie in Quellcode \ref{logic_pattern} das Ereignismuster mit Bedingungen bestückt werden. In diesem Beispiel würden Events vom Typ \textit{GameEnd} oder vom Typ \textit{GameAction} erfasst werden.
+	\item \textbf{Logische Operatoren:} 
+	Das Pattern kann, wie in Quellcode \ref{logic_pattern} veranschaulicht, durch logische Operatoren wie \texttt{and, or , not} zusammengesetzt werden. So kann wie in Quellcode \ref{logic_pattern} das Ereignismuster mit Bedingungen bestückt werden. In diesem Beispiel würden Events vom Typ \texttt{GameEnd} oder vom Typ \texttt{GameAction} erfasst werden.
 	
 	\begin{lstlisting}[caption={Pattern mit logischen Operatoren}\label{logic_pattern},captionpos=b,language=SQL]
 	
@@ -115,9 +115,9 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	
 	\end{lstlisting}
 	
-	\item Nachfolge-Operator:
-	Der Nachfolge-Operator \texttt{->} tritt ein wenn das davor, gefolgt vom danach definiertem Ereignis eintrifft. In Quellcode \ref{follow_pattern}  würden alle Endevents betrachtet, welche auf ein Aktionsevent folgen. Die Bedingung trifft zu, wenn der vorangegangene Zug ein Spielausstieg(\textit{action = "FOLD"}) war.
-	Wie im Quellcode zu erkennen ist, werden die Ereignisse in Variablen \textit{a, b} gespeichert(bspw. \textit{a=GameAction}). So können die Werte im nächsten Schritt weiterverwendet werden. Im Beispiel wird das Folgeevent (\textit{b=GameEnd(a.playerName != b.playerName)}) überprüfen ob der Spieler-Name ungleich dem vorherigen ist und im Erfolgsfall erfasst. Auf diese Art und Weise lassen ich komplexe bedingte Ereignismuster definieren.
+	\item \textbf{Nachfolge-Operator:}
+	Der Nachfolge-Operator \texttt{->} tritt ein wenn das davor, gefolgt vom danach definierten Ereignis eintrifft. In Quellcode \ref{follow_pattern}  werden alle Endevents betrachtet, welche auf ein Aktionsevent folgen. Die Bedingung trifft zu, wenn der vorangegangene Zug ein Spielausstieg(\texttt{action = "FOLD"}) war.
+	Wie im Quellcode zu erkennen ist, werden die Ereignisse in Variablen \texttt{a, b} gespeichert(bspw. \texttt{a=GameAction}). So können die Werte im nächsten Schritt weiterverwendet werden. Im Beispiel wird das Folgeevent (\texttt{b=GameEnd(a.playerName != b.playerName)}) überprüfen ob der Spieler-Name ungleich dem vorherigen ist und im Erfolgsfall erfasst. Auf diese Art lassen sich komplexe bedingte Ereignismuster definieren.
 	
 	\begin{lstlisting}[caption={Pattern mit Follow-Operator }\label{follow_pattern},captionpos=b,language=SQL]
 	
@@ -126,10 +126,21 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	
 	\end{lstlisting}
 	
-	\item Zeitliche Beobachter (engl. Observer):
-	Das letzte, wie zum Beispiel Zeit-Überwacher, können nach der \texttt{where}-Klausel angegeben werden. Beispielsweise kann ein Timer, welcher den Ereignisstrom beschränkt, mit \texttt{timer:within} definiert werden. Dieser kann mit \texttt{timer:interval}
-	\texttt{timer:at}
-	...
+	\item \textbf{Bedingungen:}
+	Um Grenzen zu definieren, nach welcher das Pattern geprüft wird, dient die \texttt{where}-Klausel. Nach ihr können verschiedene Bedingungen, durch Konstellationen der Operatoren, angegeben werden.
+	
+	\item \textbf{Überwacher} (engl. Observer):
+	Um Ereignisströme zu überwachen werden Observer verwendet, welche beispielsweise in einem Zeitintervall oder zu einem Zeitpunkt agieren. Sie können nach der \texttt{where}-Klausel angegeben werden. Beispielsweise kann ein Timer mit Intervall, durch \texttt{timer:interval} definiert werden. Ein Zeitpunkt wird
+	mit \texttt{timer:at} festgelegt, eine Zeitspanne mit \texttt{timer:within}. Für das Casino wird der Überwacher auf ein Zeitintervall eines Werktages gesetzt, um nur die Ereignisse des aktuellen Tages zu erhalten. So fließen die historischen Daten nicht verfälschend in die Auswertung mit ein.
+	
+	\begin{lstlisting}[caption={Pattern mit Observer }\label{observer_pattern},captionpos=b,language=SQL]
+	
+	every a = GameActionEvent(action="FOLD") -> b =
+	GameEndEvent(a.playerName != b.playerName)
+	where timer:within(28800 seconds)
+	
+	\end{lstlisting}
+	
 \end{enumerate}
 
 
