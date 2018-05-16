@@ -1,58 +1,67 @@
 % !TEX encoding = UTF-8 Unicode
 \chapter{Konzepte}
 Die Konzepte welche Esper verwendet werdet, dienen dazu, den kompletten Ereignisfluss von der Aktion bis zur Verarbeitung und nachfolgenden Aktionen, abzubilden.
-Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Ereignismuster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. Im folgenden werden die eben erwähnten Komponenten näher erläutert.
+Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Ereignismuster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. Im folgenden werden die eben erwähnten Komponenten näher erläutert. Nähere Informationen zu den Konzepten und weitere, hier nicht näher erläuterte, Möglichkeiten von Esper können der Dokumentation \cite{EsperRef2018} entnommen werden.
 
 \section{Statements}
 
 Statements dienen dazu Muster zu definieren, mit deren Hilfe die Event-Engine den Datenstrom analysiert. Hierzu existiert die \acf{EPL}, welche stark an den Syntax von SQL erinnert. Mit ihrer Hilfe wird die Ereignisverarbeitung in Esper umgesetzt.
+\cite{EsperRef2018}[7-8]
 
 \section{Select}
 
-Quelltext \ref{basic_select} zeigt ein einfaches Select-Statement. Resultierend hieraus, wird der \acf{EP} auf alle Ereignisse vom Typ \textit{Action} reagieren und diese bei Eintritt erfassen. Sie werden unverändert weitergegeben. Dieses Statement wird im dem Casino eingesetzt, um über sämtliche Züge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse feingranular untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
-
-\begin{lstlisting}[caption={Statement Selektion}\label{basic_select},captionpos=b,language=SQL]
+Quelltext \ref{basic_select} zeigt ein einfaches Select-Statement. Resultierend hieraus, wird der \acf{EP} auf alle Ereignisse vom Typ \texttt{Action} reagieren und diese bei Eintritt erfassen. 
+\begin{lstlisting}[caption={Statement einfache Selektion}\label{basic_select},captionpos=b,language=SQL]
 
 select * from GameActionEvent
 
 \end{lstlisting}
-
+Der Ablauf wird beispielhaft in Abbildung \ref{basic_select_img} grafisch dargestellt. Sie werden unverändert weitergegeben. Dieses Statement wird im dem Casino eingesetzt, um über sämtliche Züge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse feingranular untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
+\cite{EsperRef2018}[8-9]
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight, keepaspectratio]{images/statement_basic_select.png}
-	\caption{Ablauf Quelltext 1}
-	\label{basic_select}
+	\caption{Ablauf einfache Selektion}
+	\label{basic_select_img}
 \end{figure}
 
 \section{Filter}
 
-Die Filterfunktion ist eine geeignete Möglichkeit, die Selektion aus dem Ereignisfluss auf definierte Attribute zu beschränken. Wie das Beispiel in Quelltext \ref{filter_select} veranschaulicht, können, wie im SQL Syntax, Ereigniseigenschaften beschränkt werden.
-Es werden nur die Attribute \textit{playerName} und \textit{deck} der auftretenden Ereignisse vom Typ \textit{GameEnd} berücksichtigt und weiterverarbeitet, wie Abbildung (\ref{filter_select}) zeigt.
-Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen wird. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
-
+Die Filterfunktion ist eine geeignete Möglichkeit, die Selektion aus dem Ereignisfluss auf bestimmte Attribut-Werte zu beschränken. Wie das Beispiel in Quelltext \ref{filter_select} veranschaulicht, können, wie im SQL Syntax, Ereigniseigenschaften beschränkt werden.
 \begin{lstlisting}[caption={Statement mit Filter}\label{filter_select},captionpos=b,language=SQL]
 
-select playerName, deck from GameEndEvent
+select playerName, deck from GameEndEvent(deck="ROYAL_FLUSH")
 
 \end{lstlisting}
-
+Wie Quellcode (\ref{filter_select}) zeigt, selektiert die Event-Engine die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent}. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
+Der Ablauf des Quellcodes wird in Abbildung \ref{filter_select_img} grafisch aufgezeigt.
+Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen wird. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
+\cite{EsperRef2018}[10-11]
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight, keepaspectratio]{images/statement_basic_filter.png}
-	\caption{Ablauf Quelltext 2}
-	\label{filter_select}
+	\caption{Ablauf gefilterte Selektion}
+	\label{filter_select_img}
 \end{figure}
 
 \section{Aggregation}
 
-Um zu erfahren, welcher Spieler wie oft gewonnen hat wird die Aggregationsfunktion \textit{count(playerName)}. Quelltext \ref{aggregation_select} zeigt das dazu passende Statement. Dies hat zur Folge, dass der Ereignisstrom die auftretenden Ereignisse vom Typ \textit{GameEvent} mit selbem Spieler-Namen zählt. Der errechnete Wert wird mithilfe von \textit{as wins} in eine neues Attribut mit Alias "wins" gespeichert. Weitere Aggregationsfunktionen wie \textit{sum()}, \textit{avg()}, usw. sind ebenso verfügbar.
-Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysierenden Daten befinden. Um nur die Daten des aktuellen Tages auswerten zu können, sind Beschränkungen des auszuwertenden Ereignisstroms erforderlich. Die \acf{EPL} bietet hierfür sogenannte Data-Windows.
-
+Um zu erfahren, welcher Spieler wie oft gewonnen hat wird die Aggregationsfunktion \texttt{count(playerName)} verwendet.
 \begin{lstlisting}[caption={Statement mit Aggregation}\label{aggregation_select},captionpos=b,language=SQL]
 
 select playerName, count(playerName) as wins, deck from GameEndEvent
 
 \end{lstlisting}
+ Quelltext \ref{aggregation_select} zeigt das dazu passende Statement. Dies hat zur Folge, dass der Ereignisstrom die auftretenden Ereignisse vom Typ \texttt{GameEvent} mit selbem Spieler-Namen zählt. Der errechnete Wert wird mithilfe von \texttt{as wins} in eine neues Attribut mit Alias "wins" gespeichert.
+Der Ablauf hierbei ist in Abbildung \ref{aggregation_select_img} veranschaulicht. Zudem sind weitere Aggregationsfunktionen wie \texttt{sum()}, \texttt{avg()} in Esper verfügbar.
+Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysierenden Daten befinden. Um nur die Daten des aktuellen Tages auswerten zu können, sind Beschränkungen des auszuwertenden Ereignisstroms erforderlich. Die \acf{EPL} bietet hierfür sogenannte Data-Windows.
+\cite{EsperRef2018}[9-10]
+\begin{figure}[ht]
+	\centering
+	\includegraphics[width=\textwidth,height=\textheight, keepaspectratio]{images/statement_basic_aggregation.png}
+	\caption{Ablauf Selektion mit Aggregation}
+	\label{aggregation_select_img}
+\end{figure}
 
 \section{Data-Windows}
 \label{Data-Windows}
@@ -65,7 +74,7 @@ select playerName, count(playerName) as wins, deck from GameEndEvent
 
 Mit dem \textbf{Length Window} können mehrere Events im Bezug zueinander betrachtet werden (Kausalität). Hierzu wird eine Länge angegeben (in der Abbildung wird die Länge 2 verwendet), welche angibt, wie viele Events zusätzlich zum aktuellen betrachtet werden sollen. In diesem Fall würde das aktuelle Event und das vorherige Event betrachtet werden. Die Art des Events wird im Statement angegeben. Für das obige Beispiel könnte dies folgendermaßen aussehen:
 
-\begin{lstlisting}[caption={Statement mit Length Window}\label{aggregation_select},captionpos=b,language=SQL]
+\begin{lstlisting}[caption={Statement mit Length Window}\label{length_select},captionpos=b,language=SQL]
 
 select * from GameActionEvent.win:length(2)
 
@@ -95,6 +104,7 @@ select * from GameActionEvent.win:length(2)
 \section{Patterns}
 
 Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogenannte Patterns dar. Events, welche den Bedingungen entsprechen werden erfasst. Hierbei kommen verschiedene Elemente bei der Pattern-Definition zum Einsatz.
+\cite{EsperRef2018}[25]
 
 \begin{enumerate}
 	\item \textbf{Kontrolloperator:} \texttt{every} definiert die Erstellung eines Pattern und regelt die Abarbeitung. Es wird alle(engl. every) auf das Ereignismuster zutreffende Ereignisse erfasst. Ein simples Pattern, welches alle Ereignisse des eines Tages vom Typ \texttt{GameActionEvent} erfasst, kann Quellcode \ref{basic_pattern} entnommen werden.
@@ -145,6 +155,21 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 
 
 \section{Partitions}
+
+Esper bietet die Möglichkeit Abfragen zu partitionieren.
+Hierzu wird ein zeitlicher Context mit \texttt{create context} erstellt.
+\texttt{start} definiert den Start-, \texttt{end} den Endzeitpunkt.
+Mit \texttt{after 28800 sec} wir die Dauer dynamisch auf eine Zeitspanne von acht Stunden gesetzt. Verwendet wird der erzeugte Context mit texttt{context OneWorkDay}. Diese Deklaration sorgt dafür, dass sich das darauffolgende \texttt{select}-Statement auf die Partition bezieht.
+In Quellcode \ref{partitioned_pattern} wird mit dem ersten Statement eine achtstündige Partition erstellt. Diese wird in der zweiten Zeile verwendet, um die Spieler- und Spielzugnamen aller Aktionen eines Arbeitstagen zu erfassen.
+\cite{EsperRef2018}[18]
+
+\begin{lstlisting}[caption={Partitioniertes Pattern}\label{partitioned_pattern},captionpos=b,language=SQL]
+
+create context OneWorkDay start @now end after 28800 sec
+
+context OneWorkDay select playerName, action from GameActionEvent
+
+\end{lstlisting}
 
 \section{Kombinierte Statements}
 
