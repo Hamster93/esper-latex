@@ -1,11 +1,15 @@
 % !TEX encoding = UTF-8 Unicode
 \chapter{Konzepte}
 Die Konzepte welche Esper verwendet werdet, dienen dazu, den kompletten Ereignisfluss von der Aktion bis zur Verarbeitung und nachfolgenden Aktionen, abzubilden.
-Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Ereignismuster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. Im folgenden werden die eben erwähnten Komponenten näher erläutert. Nähere Informationen zu den Konzepten und weitere, hier nicht näher erläuterte, Möglichkeiten von Esper können der Dokumentation \cite{EsperRef2018} entnommen werden.
+Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Ereignismuster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. 
+Wie die Konfiguration, mit Ereignisdefinition-, Registrierung, sowie das Feuern und Verarbeiten der Ereignisse, in Esper umgesetzt wird, ist in Kapitel \ref{kapitel_architektur} beschrieben.
+Nähere Informationen zu den Konzepten und weitere, hier nicht näher erläuterte, Möglichkeiten von Esper können der Dokumentation \cite{EsperRef2018} entnommen werden.
+Im folgenden werden die Konzepte von Esper erläutert. Anschließend wird jeweils Bezug auf einen Casino-Anwendungsfall genommen und erläutert.
+
 
 \section{Statements}
 
-Statements dienen dazu Muster zu definieren, mit deren Hilfe die Event-Engine den Datenstrom analysiert. Hierzu existiert die \acf{EPL}, welche stark an den Syntax von SQL erinnert. Mit ihrer Hilfe wird die Ereignisverarbeitung in Esper umgesetzt.
+Statements dienen dazu Muster zu definieren, mit deren Hilfe die Event-Engine den Datenstrom analysiert. Hierzu existiert die \acf{EPL}, welche stark an den Syntax von SQL erinnert. Mit ihr werden die Ereignismuster definiert und die Ereignisverarbeitung umgesetzt.
 \cite{EsperRef2018}[7-8]
 
 \section{Select}
@@ -18,6 +22,7 @@ select * from GameActionEvent
 \end{lstlisting}
 Der Ablauf wird beispielhaft in Abbildung \ref{basic_select_img} grafisch dargestellt. Sie werden unverändert weitergegeben. Dieses Statement wird im dem Casino eingesetzt, um über sämtliche Züge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse feingranular untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
 \cite{EsperRef2018}[8-9]
+
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight, keepaspectratio]{images/statement_basic_select.png}
@@ -34,7 +39,7 @@ select playerName, deck from GameEndEvent(deck="ROYAL_FLUSH")
 
 \end{lstlisting}
 Wie Quellcode (\ref{filter_select}) zeigt, selektiert die Event-Engine die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent}. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
-Der Ablauf des Quellcodes wird in Abbildung \ref{filter_select_img} grafisch aufgezeigt.
+Der Ablauf des Quellcodes wird in Abbildung \ref{filter_select_img} grafisch aufgezeigt. Gut zu sehen, ist, dass nur die End-Events erfasst werden, welche dem Attribut-Wert entsprechen. Weil nur ein Spieler mit einem Royal-Flush-Blatt gewinnt, wird auch nur dieses Ereignis verarbeitet.
 Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen wird. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
 \cite{EsperRef2018}[10-11]
 \begin{figure}[ht]
@@ -52,10 +57,12 @@ Um zu erfahren, welcher Spieler wie oft gewonnen hat wird die Aggregationsfunkti
 select playerName, count(playerName) as wins, deck from GameEndEvent
 
 \end{lstlisting}
- Quelltext \ref{aggregation_select} zeigt das dazu passende Statement. Dies hat zur Folge, dass der Ereignisstrom die auftretenden Ereignisse vom Typ \texttt{GameEvent} mit selbem Spieler-Namen zählt. Der errechnete Wert wird mithilfe von \texttt{as wins} in eine neues Attribut mit Alias "wins" gespeichert.
-Der Ablauf hierbei ist in Abbildung \ref{aggregation_select_img} veranschaulicht. Zudem sind weitere Aggregationsfunktionen wie \texttt{sum()}, \texttt{avg()} in Esper verfügbar.
+'' gespeichert.
+Der Ablauf hierbei ist in Abbildung \ref{aggregation_select_img} veranschaulicht. 
+Zudem sind weitere Aggregationsfunktionen wie \texttt{sum()} oder \texttt{avg()} in Esper verfügbar.
 Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysierenden Daten befinden. Um nur die Daten des aktuellen Tages auswerten zu können, sind Beschränkungen des auszuwertenden Ereignisstroms erforderlich. Die \acf{EPL} bietet hierfür sogenannte Data-Windows.
 \cite{EsperRef2018}[9-10]
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight, keepaspectratio]{images/statement_basic_aggregation.png}
@@ -107,8 +114,8 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 \cite{EsperRef2018}[25]
 
 \begin{enumerate}
-	\item \textbf{Kontrolloperator:} \texttt{every} definiert die Erstellung eines Pattern und regelt die Abarbeitung. Es wird alle(engl. every) auf das Ereignismuster zutreffende Ereignisse erfasst. Ein simples Pattern, welches alle Ereignisse des eines Tages vom Typ \texttt{GameActionEvent} erfasst, kann Quellcode \ref{basic_pattern} entnommen werden.
-	In der \texttt{where}-Klausel können wie bei der Selektion weitere Bedingungen, definiert werden.
+	\item \textbf{Kontrolloperator:} \texttt{every} definiert die Erstellung eines Pattern und regelt die Abarbeitung. Es wird alle(engl. every) auf das Ereignismuster zutreffende Ereignisse erfasst. Ein simples Pattern, welches alle Ereignisse vom Typ \texttt{GameActionEvent} erfasst, kann Quellcode \ref{basic_pattern} entnommen werden.
+	Mit der \texttt{where}-Klausel können wie bei der Selektion weitere Bedingungen, definiert werden.
 	
 	\begin{lstlisting}[caption={Einfaches Pattern mit Where-Klausel}\label{basic_pattern}, captionpos=b,language=SQL]
 	
