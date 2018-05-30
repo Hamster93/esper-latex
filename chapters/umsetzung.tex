@@ -53,6 +53,53 @@ Die Event-Klassen \textbf{GameStartEvent} und \textbf{GameEndEvent} bilden den S
 
 Im Laufe der Partie werden verschiedene Aktionen der Spieler durchgeführt. Diese sind durch die Event-Klasse \textbf{GameActionEvent} abgebildet. Das Event beinhaltet ein Feld für die Aktionsart (z.B. "rise", wenn ein Spieler erhöht hat).
 
+\subsection{Architektur}
+\label{kapitel_architektur}
+Die nachfolgende Abbildung zeigt die Architektur von Esper.
+Dabei ist sie, für einen einfacheren Einstieg in Esper, auf die wichtigsten Komponenten beschränkt.
+
+\begin{figure}[ht]
+	\centering
+	\includegraphics{images/Architektur.png}
+	\caption{Architektur von Esper}
+	\label{architektur}
+\end{figure}
+
+Die \textbf{Configuration}-Klasse wird verwendet, um die Esper-Engine zu konfigurieren. Unter anderem lassen sich dort die Event-Typen registrieren, die verarbeitet werden sollen. Neben den Event-Typen, können Plugins registriert werden. Durch Plugins werden benutzerdefinierte Funktionen eingebunden (z.B für den Vergleich von Geo-Koordinaten).
+Nachfolgend zeigt die Basis-Konfiguration, für das Szenario, dieser Ausarbeitung:
+
+\begin{lstlisting}[caption={Basis-Konfiguration}\label{lst:basisKonfiguration},captionpos=t,language=JAVA]
+
+import com.espertech.esper.client.Configuration
+import de.htwg.da.esper.sample.event.GameActionEvent;
+import de.htwg.da.esper.sample.event.GameEndEvent;
+import de.htwg.da.esper.sample.event.GameStartEvent;
+
+Configuration config = new Configuration();
+
+// Register event types to observe
+config.addEventType("GameStart",GameStartEvent.class.getName());
+config.addEventType("Action", GameActionEvent.class.getName());
+config.addEventType("GameEnd", GameEndEvent.class.getName());
+\end{lstlisting}
+
+In der Beispiel-Konfiguration werden die Event-Typen GameStartEvent, GameActionEvent und GameEndEvent registriert. Plugins werden nicht verwendet.
+
+Über die \textbf{EPServiceProviderManager}-Klasse kann der \textbf{EPServiceProvider} erhalten werden:
+
+\begin{lstlisting}[caption={EPServiceProvider}\label{lst:epServiceProvider},captionpos=t,language=JAVA]
+
+import com.espertech.esper.client.*;
+
+EPServiceProvider cep = EPServiceProviderManager.
+getProvider("MyEsperProvider", config);
+\end{lstlisting}
+
+
+Der erste Parameter stellt eine eindeutige Bezeichnung für den Provider dar. Dadurch ist es möglich, mehrere \textbf{EPServiceProvider} und damit mehr als eine Esper-Engine parallel zu verwenden. Als zweiter Parameter wird die zuvor  erstellte Konfiguration (siehe Quelltext \ref{lst:basisKonfiguration}) verwendet.
+
+Der \textbf{EPServiceProvider} hält die Referenzen auf die Klassen \textbf{EPAdministrator} und \textbf{EPRuntime}. 
+
 \subsection{Events versenden}
 Für das Versenden eines Events wird die Methode \textbf{sendEvent(...)} der Klasse \textbf{EPRuntime} verwendet (siehe Architektur, in Kapitel \ref{architektur}). Als Parameter kann eine beliebige Event-Klasse übergeben werden, wie nachfolgend mit einem \textbf{GameStartEvent} dargestellt:
 
