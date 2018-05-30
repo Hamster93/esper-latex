@@ -1,6 +1,7 @@
 % !TEX encoding = UTF-8 Unicode
 \chapter{Umsetzung}
 In diesem Kapitel wird beschrieben, wie Esper installiert werden kann. Die in der Implementierung entwickelte Java-Anwendung, verwendet Esper im Kontext des Szenarios (siehe Kapitel \ref{Szenario}) dieser Arbeit.
+
 \section{Installation}
 Für die Installation von Esper wird in dieser Ausarbeitung des Build-Tool \textbf{Apache Maven} verwendet. 
 Dieses ermöglicht das automatisierte Herunterladen der Esper-Engine. Hierzu wird eine Konfigurationsdatei für Maven benötigt, die sogenannte \textbf{pom.xml}. Nachfolgend wird diese für das Szenario dargestellt:
@@ -35,13 +36,16 @@ Nach dem Download kann die Esper-Engine direkt bei der Entwicklung einer Java-An
 
 \section{Implementierung}
 Dieses Kapitel beinhaltet die einzelnen Schritte der Implementierung des Szenarios (beschrieben in Kapitel \ref{Szenario}). Zu beginn werden die erzeugten Event-Klassen beschrieben, anschließend wird das Versenden der Events und deren Verarbeitung behandelt.
+
 \subsection{Event-Klassen}
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{images/Events.png}
 	\caption{Event Klassen des Szenarios}
 	\label{EventKlassen}
 \end{figure}
+
 Um das Szenario abzubilden werden verschiedene Event-Klassen benötigt. Mit diesem Begriff sind Klassen gemeint, die ein Event darstellen.
 Als gemeinsame Basis dient die Event-Klasse \textbf{BaseEvent} (Siehe Abbildung \ref{EventKlassen}). Dieses Event beinhaltet den Spieler-Namen und einen Zeitstempel. Diese beiden Felder werden in allen Events benötigt.
 
@@ -51,6 +55,7 @@ Im Laufe der Partie werden verschiedene Aktionen der Spieler durchgeführt. Dies
 
 \subsection{Events versenden}
 Für das Versenden eines Events wird die Methode \textbf{sendEvent(...)} der Klasse \textbf{EPRuntime} verwendet (siehe Architektur, in Kapitel \ref{architektur}). Als Parameter kann eine beliebige Event-Klasse übergeben werden, wie nachfolgend mit einem \textbf{GameStartEvent} dargestellt:
+
 \begin{lstlisting}[caption={Event versenden}\label{lst:fireEvent},captionpos=t,language=Java]
 
 EPServiceProvider cep = EPServiceProviderManager.
@@ -61,9 +66,11 @@ final EPRuntime cepRT = cep.getEPRuntime();
 // Fire sample event
 cepRT.sendEvent(new GameStartEvent());
 \end{lstlisting}
-Damit die Events für das Szenario einfach erzeugt und versendet werden können, wird eine Generator-Klasse verwendet, im Folgenden \textbf{EventGenerator} genannt. Darunter versteht man eine Klasse, die für das Generieren von Beispielwerten verwendet wird.
 
-\begin{lstlisting}[caption={Event Generator}\label{lst:eventGenerator},captionpos=t,language=Java]
+\subsection{Events generieren}
+Damit die Events für das Szenario einfach erzeugt und versendet werden können, wird eine Hilfs-Klasse (\textbf{EventGenerator}) verwendet. Dieser ist zuständig für die Generierung von Beispiel-Events (z.B. \textbf{GameActionEvent}).
+
+\begin{lstlisting}[caption={Event Generator}\label{eventGenerator},captionpos=t,language=Java]
 public final class EventGenerator {
   private static String[] PLAYER_NAMES = {"Clemens", "Lukas", "Kathrin"};
   private static Random GENERATOR = new Random();
@@ -73,26 +80,6 @@ public final class EventGenerator {
     final Date timestamp = randomTimestamp();
     final GameActionType gameActionType = randomGameActionType();
     return new GameActionEvent(playerName, timestamp, gameActionType);
-  }
-	
-  public static GameEndEvent randomGameEndEvent() {
-    final String playerName = randomPlayerName();
-    final Date timestamp = randomTimestamp();
-    final int prize = GENERATOR.nextInt(500000);
-    final Deck deck = randomDeck();
-
-    return new GameEndEvent(playerName, timestamp, prize, deck);
-  }
-
-  public static GameStartEvent randomGameStartEvent() {
-    final Date timestamp = randomTimestamp();
-
-    return new GameStartEvent(PLAYER_NAMES, timestamp);
-  }
-	
-  private static Deck randomDeck() {
-    int deckIndex = GENERATOR.nextInt(Deck.values().length);
-    return Deck.values()[deckIndex];
   }
 
   private static GameActionType randomGameActionType() {
@@ -112,4 +99,9 @@ public final class EventGenerator {
   }
 }
 \end{lstlisting}
+
+Zur besseren Übersichtlichkeit sind nicht alle Methoden im Quellcode \ref{eventGenerator} enthalten.
+ Gezeigt wird, dass über den Aufruf der Methode \textbf{randomGameActionEvent()} ein zufälliges \textbf{GameActionEvent} erzeugt wird. Hierzu werden für das zu erzeugende Event ein zufälliger Spieler-Name, Zeitstempel und Aktionstyp generiert. Die möglichen Werte können konfiguriert werden. Im obigen Beispiel sind dies ''Clemens'', ''Lukas'' und ''Kathrin'' als Spieler-Namen, die aktuelle Zeit als Zeitstempel und ein zufälliger Aktionstyp aus den möglichen Aktionen in Poker.
+
 \subsection{Events verarbeiten}
+
