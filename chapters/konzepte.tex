@@ -3,13 +3,24 @@
 Die Konzepte welche Esper verwendet werdet, dienen dazu, den kompletten Ereignisfluss von der Aktion bis zur Verarbeitung und nachfolgenden Aktionen, abzubilden.
 Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Ereignismuster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. 
 Wie die Konfiguration, mit Ereignisdefinition-, Registrierung, sowie das Feuern und Verarbeiten der Ereignisse, in Esper umgesetzt wird, ist in Kapitel \ref{kapitel_architektur} beschrieben.
-Nähere Informationen zu den Konzepten und weitere, hier nicht näher erläuterte, Möglichkeiten von Esper können der Dokumentation \cite{EsperRef2018} entnommen werden.
+Nähere Informationen zu den Konzepten und weitere, hier nicht näher erläuterte Möglichkeiten von Esper, können der Dokumentation \cite{EsperRef2018} entnommen werden.
 Im folgenden werden die Konzepte von Esper erläutert. Anschließend wird jeweils Bezug auf einen Casino-Anwendungsfall genommen und aufgezeigt.
 
 
 \section{Statements}
 \label{statements}
-Statements dienen dazu Muster zu definieren, mit deren Hilfe die Event-Engine den Datenstrom analysiert. Hierzu existiert die \acf{EPL}, welche stark an den Syntax von SQL erinnert. Mit ihr werden die Ereignismuster definiert und die Ereignisverarbeitung umgesetzt.
+Statements dienen dazu Muster zu definieren, mit deren Hilfe die Event-Engine den Datenstrom analysiert. Hierzu existiert die \acf{EPL}, welche stark an den Syntax von SQL erinnert. Diese deklarative Abfragesprache wurde eigens für Esper entwickelt. Mit ihr werden die Ereignismuster definiert und die Ereignisverarbeitung umgesetzt. Der Grundlegende Aufbau eines Statements zeigt Quelltext \ref{structure_select}.
+\begin{lstlisting}[caption={Beispielhafter Aufbau eines Statements }\label{structure_select},captionpos=b,language=SQL]
+
+select playerName 
+from GameActionEvent.win:time(28800 sec)
+where playerName='Lukas'
+
+\end{lstlisting}
+Mit \texttt{select} werden die auszuwertenden Ereignis-Attribute selektiert. Durch Angabe von \texttt{*} wird das gesamte Ereignis mit allen Attributen weitergegeben.
+Anschließend wird der Ereignisstrom mit \texttt{from} definiert.
+Nur die hier definierten Ereignistypen werden berücksichtigt. Zudem kann bei Bedarf ein Auswertungsfenster angegeben sein, um die Abfrage beispielsweise auf ein Zeitfenster zu begrenzen.
+Bedingungen können mit \texttt{where} festgelegt werden. So sind Restriktionen auf die selektierten Attribut-Werte möglich.
 \cite{EsperRef2018}[7-8]
 
 \section{Select}
@@ -57,9 +68,9 @@ Um zu erfahren, welcher Spieler wie oft gewonnen hat wird die Aggregationsfunkti
 select playerName, count(playerName) as wins, deck from GameEndEvent
 
 \end{lstlisting}
-'' gespeichert.
 Der Ablauf hierbei ist in Abbildung \ref{aggregation_select_img} veranschaulicht. 
-Zudem sind weitere Aggregationsfunktionen wie \texttt{sum()} oder \texttt{avg()} in Esper verfügbar.
+Zudem sind weitere Aggregationsfunktionen in Esper verfügbar.
+So können die Ereignisse mit \texttt{sum()} summiert werden. Der Durchschnitt wird durch \texttt{avg()}, Minimal-, sowie Maximalwert mit \texttt{min()} und \texttt{max()} errechnet. \texttt{count()} gibt die Anzahl der Auftretenden Ereignisse. Mit \texttt{median()}, \texttt{stddev()}, \texttt{avedev()} wird der Median, die Standardabweichung, und die Abweichung zum Mittelwert errechnet.
 Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysierenden Daten befinden. Um nur die Daten des aktuellen Tages auswerten zu können, sind Beschränkungen des auszuwertenden Ereignisstroms erforderlich. Die \acf{EPL} bietet hierfür sogenannte Data-Windows.
 \cite{EsperRef2018}[9-10]
 
