@@ -72,6 +72,11 @@ Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysieren
 
 \section{Data-Windows}
 \label{Data-Windows}
+
+\textbf{Data-Windows} werden in Esper verwendet, um Events im Bezug zueinander zu betrachten (Kausalität). Je nach Eigenschaft des \textbf{Data-Windows}, werden sie anhand von Kriterien (z.B. Anzahl oder Zeit) betrachtet.
+
+Ein sehr einfaches \textbf{Data-Window} ist das nachfolgend dargestellte \textbf{Length Window}: 
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{images/data_window_length.png}
@@ -79,13 +84,19 @@ Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysieren
 	\label{LengthWindow}
 \end{figure}
 
-Mit dem \textbf{Length Window} können mehrere Events im Bezug zueinander betrachtet werden (Kausalität). Hierzu wird eine Länge angegeben (in der Abbildung wird die Länge 2 verwendet), welche angibt, wie viele Events zusätzlich zum aktuellen betrachtet werden sollen. In diesem Fall würde das aktuelle Event und das vorherige Event betrachtet werden. Die Art des Events wird im Statement angegeben. Für das obige Beispiel könnte dies folgendermaßen aussehen:
+Dieses \textbf{Data-Window} wird mit einer Länge konfiguriert (in der Abbildung, ist der Wert 2), welche angibt, wie viele Events zusätzlich zum aktuellen betrachtet werden sollen. In diesem Fall würde das aktuelle und vorherige Event betrachtet werden.
+
+Die Art des Events wird im Statement angegeben. Für das obige Beispiel könnte dies folgendermaßen aussehen:
 
 \begin{lstlisting}[caption={Statement mit Length Window}\label{length_select},captionpos=b,language=SQL]
 
 select * from GameActionEvent.win:length(2)
 
 \end{lstlisting}
+
+Wichtig ist an dieser Stelle anzumerken, dass das Statement des \textbf{Length Windows} erfüllt ist, sobald mindestens ein Event vom Typ \textbf{GameActionEvent} vorhanden ist. Dabei spielt die angegebene Länge keine Rolle. Nur wenn der Event-Strom mehrere passende Events beinhaltet, wird das \textbf{Length Window} ''gefüllt'' bis zu seiner maximalen Länge.
+
+Ein \textbf{Data-Window} mit einem anderen Ansatz, ist das \textbf{Length-Batch Window}:
 
 \begin{figure}[ht]
 	\centering
@@ -94,6 +105,10 @@ select * from GameActionEvent.win:length(2)
 	\label{LengthBatchWindow}
 \end{figure}
 
+Dieses \textbf{Data-Window} verhält sich fast identisch zum \textbf{Length Window}, wird allerdings erst erfüllt, wenn genau so viele oder mehr Events im Event-Strom vorhanden sind, wie als Länge des \textbf{Data Windows} angegeben. Dadurch ist es möglich, Abfragen zu erstellen, die zuerst eine gewisse Anzahl an Events benötigen, um eine sinnvolle Weiterverarbeitung zu gewährleisten.
+
+Neben dem betrachten der Anzahl von Events als Kriterium, gibt es auch die Möglichkeit der zeitlichen Betrachtung. Ein Beispiel hierfür ist das \textbf{Time Window}:
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{images/data_window_time.png}
@@ -101,12 +116,20 @@ select * from GameActionEvent.win:length(2)
 	\label{TimeWindow}
 \end{figure}
 
+Bei diesem \textbf{Data-Window} werden alle Events innerhalb des konfigurierten Zeitabschnittes betrachtet.
+Dabei wird stets vom aktuellen Zeitpunkt aus, anhand des angegeben Zeitwertes (z.B. 5 Sekunden), in die Vergangenheit gegangen. In anderen Worten, würden wir als Ergebnis das aktuelle Event erhalten und alle Events die bis zu 5 Sekunden vorher stattgefunden haben.
+
+Zu Letzt gibt es auch ein \textbf{Data-Window} ohne Kriterium, das \textbf{Keep-All Window}:
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{images/data_window_keep_all.png}
 	\caption{Keep-All Window}
 	\label{KeepAllWindow}
 \end{figure}
+
+Dieses \textbf{Data-Window} ist erfüllt, sobald das erste Event im Event-Storm auftaucht. Es werden beliebig viele Events gesammelt und im Speicher gehalten.
+Aufgrund von dem hohen Speicherverbrauch, sollte dieses nur eingesetzt werden, wenn eine kleine Event-Menge vorliegt und diese Gesamt Betracht werden sollen.
 
 \section{Patterns}
 
