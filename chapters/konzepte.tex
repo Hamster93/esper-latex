@@ -249,11 +249,9 @@ Mithilfe des \textbf{Unrestricted Consumption-Mode} lässt sich eine uneingeschr
 startet einen Mustererkenner, welcher sämtliche passende Detektor-Ereignisse berücksichtigt. Die Mustererkenner laufen parallel nebeneinander.
 Dementsprechende sieht die Ergebnismenge wie in Quelltext \ref{consumption_modes_pattern}[Zeile 12-14] aus. \cite{CEP2017}[38]
 \absatz
-Ein weiterer Modus für die Mustererkennung ist der \textbf{Recent-Unique Consumption-Mode}.
-Wie der Name andeutet, wird hierbei nur das letzte bzw. jüngste Initiator-Ereignis verwendet.
-Dabei gehört ein Detektor- immer nur zu einem Initiator-Ereignis.
-Es existiert Immer nur ein laufender Mustererkenner. Dieser wird für jedes Initiator-Ereignis neu gestartet.
-Im Gegensatz zum Recent Consumption-Mode wird nicht jedes Detektor Ereignis bis zum nächsten Initiator berücksichtigt, sondern einzig das zu erst auftretende. Die daraus resultierende Ergebnismenge ist in \ref{consumption_modes_pattern}[Zeile 19] aufgezeigt.
+Beim \textbf{Recent-Unique Consumption-Mode} wird,
+wie der Name andeutet, nur das letzte bzw. jüngste Initiator-Ereignis verwendet. Dabei gehört ein Detektor- immer nur zu einem Initiator-Ereignis und es existiert nur ein laufender Mustererkenner zur selben Zeit. Dieser wird für jedes Initiator-Ereignis neu gestartet.
+Im Gegensatz zum Recent Consumption-Mode wird nicht jedes Detektor- Ereignis bis zum nächsten Initiator berücksichtigt, sondern einzig das zu erst auftretende. Die daraus resultierende Ergebnismenge ist in Quelltext \ref{consumption_modes_pattern}[Zeile 19] aufgezeigt.
 \cite{CEP2017}[39-40]
 \absatz
 Ein weiterer mit Esper umsetzbarer Parameterkontext wird mit \texttt{every (A -> B)} definiert.
