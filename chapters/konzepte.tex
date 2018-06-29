@@ -20,7 +20,7 @@ where playerName='Lukas'
 Mit \texttt{select} werden die auszuwertenden Ereignis-Attribute selektiert. Durch Angabe von \texttt{*} wird das gesamte Ereignis mit allen Attributen weitergegeben.
 Anschließend wird der Ereignisstrom mit \texttt{from} definiert.
 Nur die hier definierten Ereignistypen werden berücksichtigt. Zudem kann bei Bedarf ein Auswertungsfenster angegeben sein, um die Abfrage beispielsweise auf ein Zeitfenster zu begrenzen.
-Bedingungen können mit \texttt{where} festgelegt werden. So sind Restriktionen auf die selektierten Attribut-Werte möglich.
+Bedingungen können mit \texttt{where} festgelegt werden. Hierdurch sind Restriktionen auf die selektierten Attribut-Werte möglich.
 \cite{EsperRef2018}[7-8]
 
 \section{Select}
@@ -32,8 +32,7 @@ select * from GameActionEvent
 
 \end{lstlisting}
 Dabei wird der \acf{EP} auf alle Ereignisse vom Typ \texttt{GameActionEvent} reagieren und diese bei Eintritt erfassen. 
-
-Der Ablauf wird beispielhaft in Abbildung \ref{basic_select_img} grafisch dargestellt. Ereignisse werden unverändert weitergegeben. Dieses Statement wird im dem Casino eingesetzt, um über sämtliche Züge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse detaillierter untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
+In Abbildung \ref{basic_select_img} ist der Ablauf dargestellt. Ereignisse werden unverändert weitergegeben. Dieses Statement wird im Casino eingesetzt, um über sämtliche Spielzüge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse detaillierter untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
 \cite{EsperRef2018}[8-9]
 
 \begin{figure}[h]
@@ -45,7 +44,7 @@ Der Ablauf wird beispielhaft in Abbildung \ref{basic_select_img} grafisch darges
 
 \section{Filter}
 
-Die Filterfunktion ist eine geeignete Möglichkeit, die Selektion aus dem Ereignisfluss auf bestimmte Attribut-Werte zu beschränken. Wie das Beispiel in Quelltext \ref{filter_select} veranschaulicht, können, wie im SQL Syntax, Ereigniseigenschaften beschränkt werden.
+Die Filterfunktion ist eine geeignete Möglichkeit, die Selektion aus dem Ereignisfluss auf bestimmte Attribut-Werte zu beschränken. In Quelltext \ref{filter_select} ist veranschaulicht, wie gleich dem SQL Syntax Ereigniseigenschaften beschränkt werden.
 \begin{lstlisting}[caption={Statement mit Filter},label=filter_select,captionpos=b,language=SQL]
 
 select playerName, deck from GameEndEvent(deck="ROYAL_FLUSH")
