@@ -3,9 +3,9 @@
 Die Konzepte welche Esper verwendet, dienen dazu, den kompletten Ereignisfluss von der Aktion bis zur Verarbeitung und nachfolgenden Aktionen, abzubilden.
 Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Ereignismuster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. 
 Wie die Konfiguration, mit Ereignisdefinition-, Registrierung, sowie das Feuern und Verarbeiten der Ereignisse, in Esper umgesetzt wird, ist in Kapitel \ref{kapitel_architektur} beschrieben.
-
 Nähere Informationen zu den Konzepten und weitere, in dieser Arbeit nicht näher erläuterten Möglichkeiten von Esper, sind in der offiziellen Dokumentation \cite{EsperRef2018} einsehbar.
-Im folgenden sind die wichtigsten Konzepte für Einarbeitung in Esper erläutert. Anschließend wird jeweils Bezug auf einen Casino-Anwendungsfall genommen und aufgezeigt (siehe Kapitel \ref{Szenario}).
+\absatz
+Im folgenden sind die wichtigsten Konzepte für Einarbeitung in Esper erläutert. Anschließend wird jeweils Bezug auf das Casino-Szenario(siehe Kapitel \ref{Szenario}) genommen und aufgezeigt.
 
 \section{Statements}
 \label{statements}
@@ -187,11 +187,10 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	
 	\item \textbf{Bedingungen:}
 	Um Grenzen zu definieren, nach welcher das Pattern geprüft wird, dient die \texttt{where}-Klausel. Nach ihr können verschiedene Bedingungen, durch Konstellationen der Operatoren, angegeben werden.
-	Meisten werden Vergleichsoperatoren wie \texttt{=, < , > , >=, <=, !=, <>, is null, is not null} und logische Kombinationen wie\texttt{and, or} verwendet. So können Ereignisse in Korrelation gestellt und ausgewertet werden. Die \texttt{where}- Klausel kann auch bei der Selektion verwendet werden.
+	Meisten werden Vergleichsoperatoren wie \texttt{=, < , > , >=, <=, !=, <>, is null, is not null} und logische Kombinationen wie \texttt{and} oder \texttt{or} verwendet. Ereignisse können hiermit in Korrelation gestellt und ausgewertet werden. Die \texttt{where}- Klausel kann auch bei der Selektion verwendet werden.
 	
 	\item \textbf{Überwacher} (engl. Observer):
-	Um Ereignisströme zu überwachen werden Observer verwendet, welche beispielsweise in einem Zeitintervall oder zu einem Zeitpunkt agieren. Sie können nach der \texttt{where}-Klausel angegeben werden. Beispielsweise kann ein Timer mit Intervall, durch \texttt{timer:interval} definiert werden. Ein Zeitpunkt wird
-	mit \texttt{timer:at} festgelegt, eine Zeitspanne mit \texttt{timer:within}. Für das Casino wird der Überwacher auf ein Zeitintervall eines Werktages gesetzt, um nur die Ereignisse des aktuellen Tages zu erhalten. So fließen die historischen Daten nicht verfälschend in die Auswertung mit ein.
+	Um Ereignisströme zu überwachen werden Observer verwendet, welche beispielsweise in einem Zeitintervall oder zu einem Zeitpunkt agieren. Sie können nach der \texttt{where}-Klausel angegeben werden. Beispielsweise kann ein Timer mit Intervall, durch \texttt{timer:interval} definiert werden. Ein Zeitpunkt wird mit \texttt{timer:at} festgelegt, eine Zeitspanne mit \texttt{timer:within}. Für das Casino wird der Überwacher auf ein Zeitintervall eines Werktages gesetzt, um nur die Ereignisse des aktuellen Tages zu erhalten. Historischen Daten fließen somit nicht verfälschend in die Auswertung mit ein.
 	
 	\begin{lstlisting}[caption={Pattern mit Observer },label=observer_pattern,captionpos=b,language=SQL]
 	
@@ -207,16 +206,15 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 \section{Consumption Modes mit Pattern}
 
 Mit Hilfe der Pattern lassen sich in Esper Consumption Modes umsetzen.
-Diese Parameterkontexte werden dazu verwendet, den Lösungsraum je nach Bedarf einzuschränken.
+Diese können als Parameterkontexte angesehen werden, welche den Lösungsraum je nach Bedarf einschränken.
 Hierzu werden verschiedene Kombinationen des \texttt{every}- und des Nachfolgeoperators, sowie die Prädikatenlogik, genutzt.
 Eine Detektion läuft wie folgt ab.
 Der Ereignisstrom wird untersucht. Sobald das \textbf{Initiator-Ereignis}, also das vor dem Nachfolgeoperator deklarierte Event, erfasst wird, startet ein Mustererkenner. Dieser sucht nach dem Event, welches als Bedingung hinter dem Nachfolgeoperator deklariert ist. Wird dieses sogenannte \textbf{Detektor-Ereignis} erkannt, gibt der Mustererkenner eine Lösung zurück. Je nach verwendetem Modus kann der Detektor weiterlaufen, oder abbrechen. Zudem können mehrere Mustererkenner parallel arbeiten, wobei der früher gestartete Vorrang erhält.
 Ereignisse im Ereignisstrom, welche nicht von Relevanz sind werden \textbf{innere Ereignisse} genannt.
 Exakte Erläuterungen zur Prädikatenlogik und damit verbunden logischen Strukturen können \cite{CEP2017}[Anhang 1] entnommen werden.
-Der Quelltext \ref{consumption_modes_pattern} zeigt einen beispielhaften Event-Fluss von Start-Events (S), End-Events (E) und Action-Events (A). Ebenso zeigt er die verschiedenen Konstellationen von Pattern-Deklarationen zur Umsetzung der Consumption Modes. Anschließend wird die Ergebnismenge angegeben, welche vom jeweiligen Pattern selektiert wird.
+Der Quelltext \ref{consumption_modes_pattern}[Zeile 2] zeigt einen beispielhaften Ereignisstrom (Zeile 2) von Start-Events (S), End-Events (E) und Action-Events (A). Ebenso zeigt er die verschiedenen Konstellationen von Pattern-Deklarationen zur Umsetzung der Consumption Modes. Anschließend wird die Ergebnismenge angegeben, welche vom jeweiligen Pattern selektiert wird.
 
-\begin{lstlisting}[caption={Pattern Deklaration Consumption Modes},label=consumption_modes_pattern,captionpos=b,language=SQL]
-
+\begin{lstlisting}[caption={Pattern Deklaration Consumption Modes},numbers=left,label=consumption_modes_pattern,captionpos=b,language=SQL]
 // Ereignisstrom:
 // { S1, A1, A2, S2, E1, A3, S3, A4, A5, E2, A6, A7, E3 }
 
@@ -245,21 +243,24 @@ from pattern [ S -> every E ]
 \end{lstlisting}
 Der \textbf{Continuous Consumption-Mode} wird als Pattern mit \texttt{every S -> E} definiert. Dies hat zur Folge, dass der Mustererkenner für jedes auftretende S-Event, das erste darauffolgende E-Event selektiert. 
 Hierbei wird jedes Initiator-Ereignis nur einmal verwendet und startet bei Detektion einen eigenen Mustererkenner, welcher bis zum Detektor-Ereignis läuft.
-Ein Beispiel mit Ergebnis für den Unrestricted Consumption-Mode kann in Quelltext \ref{consumption_modes_pattern} gefunden werden.
-\cite{CEP2017}[40-41]\\
+Das Ergebnis für den Continuous Consumption-Mode ist in Quelltext \ref{consumption_modes_pattern}[Zeile 7] erkennbar. \cite{CEP2017}[40-41]
 \absatz
-Mithilfe des \textbf{Unrestricted Consumption-Mode} lässt sich eine uneingeschränkte Ereignisdetektion durchsetzen. von jeden Initiator-Ereignis
-wird ein Mustererkenner gestartet, welcher sämtliche passende Detektor-Ereignisse berücksichtigt. Eine dementsprechende Lösung kann Quelltext \ref{consumption_modes_pattern} entnommen werden.
+Mithilfe des \textbf{Unrestricted Consumption-Mode} lässt sich eine uneingeschränkte Ereignisdetektion durchsetzen. Jedes Initiator-Ereignis
+startet einen Mustererkenner, welcher sämtliche passende Detektor-Ereignisse berücksichtigt. Die Mustererkenner laufen parallel nebeneinander.
+Dementsprechende sieht die Ergebnismenge wie in Quelltext \ref{consumption_modes_pattern}[Zeile 12-14] aus. \cite{CEP2017}[38]
 \absatz
-Der nächste Modus für die Mustererkennung ist der \textbf{Recent-Unique Consumption-Mode}.
-Wie der Name andeutet, wird hierbei nur das letzte bzw. jüngste Initiator verwendet.
-ein Detektor immern nur zu einem Initiator.
-Immer nur Ein laufender Mustererkenner für jedes Initiator Ereignis neu gestartet.
-Im Gegensatz zum Recent Consumption-Mode wird nicht jedes Detektor Ereignis bis zum nächste Initiator berücksichtigt, sondern einzig das erste.
-
-
-ein Detektor
-
+Ein weiterer Modus für die Mustererkennung ist der \textbf{Recent-Unique Consumption-Mode}.
+Wie der Name andeutet, wird hierbei nur das letzte bzw. jüngste Initiator-Ereignis verwendet.
+Dabei gehört ein Detektor- immer nur zu einem Initiator-Ereignis.
+Es existiert Immer nur ein laufender Mustererkenner. Dieser wird für jedes Initiator-Ereignis neu gestartet.
+Im Gegensatz zum Recent Consumption-Mode wird nicht jedes Detektor Ereignis bis zum nächsten Initiator berücksichtigt, sondern einzig das zu erst auftretende. Die daraus resultierende Ergebnismenge ist in \ref{consumption_modes_pattern}[Zeile 19] aufgezeigt.
+\cite{CEP2017}[39-40]
+\absatz
+Ein weiterer mit Esper umsetzbarer Parameterkontext wird mit \texttt{every (A -> B)} definiert.
+Aufgrund fehlender Bezeichnung wir er \textbf{Unnamed Consumption-Mode} genannt.
+Die Lösungen werden bei Eintritt des Detektor-Ereignisses erfasst, woraus die Lösungsmenge in Quelltext \ref{consumption_modes_pattern}[Zeile 24] resultiert.
+Während der Detektion existiert nur ein Mustererkenner, welcher erst bei einem neuem Initiator-Ereignis neu gestartet wird.
+\cite{CEP2017}[35-44, 49-50]
 
 \section{Partitionen}
 
