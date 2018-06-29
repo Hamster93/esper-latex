@@ -52,7 +52,7 @@ select playerName, deck from GameEndEvent(deck="ROYAL_FLUSH")
 \end{lstlisting}
 Wie der Quellcode \ref{filter_select} zeigt, selektiert die Event-Engine die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent}. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
 
-Der Ablauf des Quellcodes wird in Abbildung \ref{filter_select_img} grafisch aufgezeigt. Gut zu sehen, ist, dass nur die End-Events erfasst werden, welche dem Attribut-Wert entsprechen. Weil nur ein Spieler mit einem Royal-Flush-Blatt gewinnt, wird auch nur dieses Ereignis verarbeitet.
+Der Ablauf des Quellcodes wird in Abbildung \ref{filter_select_img} aufgezeigt. Gut zu sehen ist, dass nur die End-Events erfasst werden, welche dem Attribut-Wert entsprechen. Weil nur ein Spieler mit einem Royal-Flush-Blatt gewinnt, wird auch nur dieses Ereignis verarbeitet.
 Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen wird. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
 \cite{EsperRef2018}[10-11]
 
