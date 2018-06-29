@@ -3,14 +3,13 @@
 Die Konzepte welche Esper verwendet werdet, dienen dazu, den kompletten Ereignisfluss von der Aktion bis zur Verarbeitung und nachfolgenden Aktionen, abzubilden.
 Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Ereignismuster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. 
 Wie die Konfiguration, mit Ereignisdefinition-, Registrierung, sowie das Feuern und Verarbeiten der Ereignisse, in Esper umgesetzt wird, ist in Kapitel \ref{kapitel_architektur} beschrieben.
-Nähere Informationen zu den Konzepten und weitere, hier nicht näher erläuterte Möglichkeiten von Esper, können der Dokumentation \cite{EsperRef2018} entnommen werden.
-Im folgenden werden die Konzepte von Esper erläutert. Anschließend wird jeweils Bezug auf einen Casino-Anwendungsfall genommen und aufgezeigt.
-
+Nähere Informationen zu den Konzepten und weitere, in dieser Arbeit nicht näher erläuterten Möglichkeiten von Esper, sind in der offiziellen Dokumentation \cite{EsperRef2018} einsehbar.
+Im folgenden werden die Konzepte erläutert. Anschließend wird jeweils Bezug auf einen Casino-Anwendungsfall genommen und aufgezeigt.
 
 \section{Statements}
 \label{statements}
 Statements dienen dazu Muster zu definieren, mit deren Hilfe die Event-Engine den Datenstrom analysiert. Hierzu existiert die \acf{EPL}, welche stark an den Syntax von SQL erinnert. Diese deklarative Abfragesprache wurde eigens für Esper entwickelt. Mit ihr werden die Ereignismuster definiert und die Ereignisverarbeitung umgesetzt. Der Grundlegende Aufbau eines Statements zeigt Quelltext \ref{structure_select}.
-\begin{lstlisting}[caption={Beispielhafter Aufbau eines Statements }\label{structure_select},captionpos=b,language=SQL]
+\begin{lstlisting}[caption={Beispielhafter Aufbau eines Statements },label=structure_select,captionpos=b,language=SQL]
 
 select playerName 
 from GameActionEvent.win:time(28800 sec)
@@ -26,12 +25,12 @@ Bedingungen können mit \texttt{where} festgelegt werden. So sind Restriktionen 
 \section{Select}
 
 Quelltext \ref{basic_select} zeigt ein einfaches Select-Statement. Resultierend hieraus, wird der \acf{EP} auf alle Ereignisse vom Typ \texttt{Action} reagieren und diese bei Eintritt erfassen. 
-\begin{lstlisting}[caption={Statement einfache Selektion}\label{basic_select},captionpos=b,language=SQL]
+\begin{lstlisting}[caption={Statement einfache Selektion},label=basic_select,captionpos=b,language=SQL]
 
 select * from GameActionEvent
 
 \end{lstlisting}
-Der Ablauf wird beispielhaft in Abbildung \ref{basic_select_img} grafisch dargestellt. Sie werden unverändert weitergegeben. Dieses Statement wird im dem Casino eingesetzt, um über sämtliche Züge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse feingranular untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
+Der Ablauf wird beispielhaft in Abbildung \ref{basic_select_img} grafisch dargestellt. Ereignisse werden unverändert weitergegeben. Dieses Statement wird im dem Casino eingesetzt, um über sämtliche Züge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse feingranular untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
 \cite{EsperRef2018}[8-9]
 
 \begin{figure}[h]
@@ -44,15 +43,16 @@ Der Ablauf wird beispielhaft in Abbildung \ref{basic_select_img} grafisch darges
 \section{Filter}
 
 Die Filterfunktion ist eine geeignete Möglichkeit, die Selektion aus dem Ereignisfluss auf bestimmte Attribut-Werte zu beschränken. Wie das Beispiel in Quelltext \ref{filter_select} veranschaulicht, können, wie im SQL Syntax, Ereigniseigenschaften beschränkt werden.
-\begin{lstlisting}[caption={Statement mit Filter}\label{filter_select},captionpos=b,language=SQL]
+\begin{lstlisting}[caption={Statement mit Filter},label=filter_select,captionpos=b,language=SQL]
 
 select playerName, deck from GameEndEvent(deck="ROYAL_FLUSH")
 
 \end{lstlisting}
-Wie Quellcode (\ref{filter_select}) zeigt, selektiert die Event-Engine die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent}. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
+Wie Quellcode \ref{filter_select} zeigt, selektiert die Event-Engine die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent}. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
 Der Ablauf des Quellcodes wird in Abbildung \ref{filter_select_img} grafisch aufgezeigt. Gut zu sehen, ist, dass nur die End-Events erfasst werden, welche dem Attribut-Wert entsprechen. Weil nur ein Spieler mit einem Royal-Flush-Blatt gewinnt, wird auch nur dieses Ereignis verarbeitet.
 Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen wird. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
 \cite{EsperRef2018}[10-11]
+
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight, keepaspectratio]{images/statement_basic_filter.png}
@@ -63,7 +63,7 @@ Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mi
 \section{Aggregation}
 
 Um zu erfahren, welcher Spieler wie oft gewonnen hat wird die Aggregationsfunktion \texttt{count(playerName)} verwendet.
-\begin{lstlisting}[caption={Statement mit Aggregation}\label{aggregation_select},captionpos=b,language=SQL]
+\begin{lstlisting}[caption={Statement mit Aggregation},label=aggregation_select,captionpos=b,language=SQL]
 
 select playerName, count(playerName) as wins, deck from GameEndEvent
 
@@ -99,7 +99,7 @@ Dieses \textbf{Data-Window} wird mit einer Länge konfiguriert (in der Abbildung
 
 Die Art des Events wird im Statement angegeben. Für das obige Beispiel könnte dies folgendermaßen aussehen:
 
-\begin{lstlisting}[caption={Statement mit Length Window}\label{length_select},captionpos=b,language=SQL]
+\begin{lstlisting}[caption={Statement mit Length Window},label=length_select,captionpos=b,language=SQL]
 
 select * from GameActionEvent.win:length(2)
 
@@ -151,18 +151,21 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	\item \textbf{Kontrolloperator:} \texttt{every} definiert die Erstellung eines Pattern und regelt die Abarbeitung. Es wird alle(engl. every) auf das Ereignismuster zutreffende Ereignisse erfasst. Ein simples Pattern, welches alle Ereignisse vom Typ \texttt{GameActionEvent} erfasst, kann Quellcode \ref{basic_pattern} entnommen werden.
 	Mit der \texttt{where}-Klausel können wie bei der Selektion weitere Bedingungen, definiert werden.
 	
-	\begin{lstlisting}[caption={Einfaches Pattern mit Where-Klausel}\label{basic_pattern}, captionpos=b,language=SQL]
-	
-	every GameActionEvent
+	\begin{lstlisting}[caption={Einfaches Pattern mit Where-Klausel},label=basic_pattern, captionpos=b,language=SQL]
+
+	select *
+	from patetern [ every GameActionEvent ]
 	
 	\end{lstlisting}
 	
 	\item \textbf{Logische Operatoren:} 
 	Das Pattern kann, wie in Quellcode \ref{logic_pattern} veranschaulicht, durch logische Operatoren wie \texttt{and, or , not} zusammengesetzt werden. So kann wie in Quellcode \ref{logic_pattern} das Ereignismuster mit Bedingungen bestückt werden. In diesem Beispiel würden Events vom Typ \texttt{GameEnd} oder vom Typ \texttt{GameAction} erfasst werden.
 	
-	\begin{lstlisting}[caption={Pattern mit logischen Operatoren}\label{logic_pattern},captionpos=b,language=SQL]
+	\begin{lstlisting}[caption={Pattern mit logischen Operatoren},label=logic_pattern,captionpos=b,language=SQL]
 	
-	every a=GameActionEvent or b=GameActionEvent
+	select *
+	from pattern [
+	every a=GameActionEvent or b=GameActionEvent ]
 	
 	\end{lstlisting}
 	
@@ -170,10 +173,11 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	Der Nachfolge-Operator \texttt{->} tritt ein wenn das davor, gefolgt vom danach definierten Ereignis eintrifft. In Quellcode \ref{follow_pattern}  werden alle Endevents betrachtet, welche auf ein Aktionsevent folgen. Die Bedingung trifft zu, wenn der vorangegangene Zug ein Spielausstieg(\texttt{action = "FOLD"}) war.
 	Wie im Quellcode zu erkennen ist, werden die Ereignisse in Variablen \texttt{a, b} gespeichert(bspw. \texttt{a=GameAction}). So können die Werte im nächsten Schritt weiterverwendet werden. Im Beispiel wird das Folgeevent (\texttt{b=GameEnd(a.playerName != b.playerName)}) überprüfen ob der Spieler-Name ungleich dem vorherigen ist und im Erfolgsfall erfasst. Auf diese Art lassen sich komplexe bedingte Ereignismuster definieren.
 	
-	\begin{lstlisting}[caption={Pattern mit Follow-Operator }\label{follow_pattern},captionpos=b,language=SQL]
+	\begin{lstlisting}[caption={Pattern mit Follow-Operator },label=follow_pattern,captionpos=b,language=SQL]
 	
-	every a = GameActionEvent(action="FOLD") -> b =
-	 GameEndEvent(a.playerName != b.playerName)
+	select action, playerName 
+	from pattern [every a=GameActionEvent(action="FOLD") 
+	-> b=GameEndEvent(a.playerName != b.playerName) ]
 	
 	\end{lstlisting}
 	
@@ -185,33 +189,93 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	Um Ereignisströme zu überwachen werden Observer verwendet, welche beispielsweise in einem Zeitintervall oder zu einem Zeitpunkt agieren. Sie können nach der \texttt{where}-Klausel angegeben werden. Beispielsweise kann ein Timer mit Intervall, durch \texttt{timer:interval} definiert werden. Ein Zeitpunkt wird
 	mit \texttt{timer:at} festgelegt, eine Zeitspanne mit \texttt{timer:within}. Für das Casino wird der Überwacher auf ein Zeitintervall eines Werktages gesetzt, um nur die Ereignisse des aktuellen Tages zu erhalten. So fließen die historischen Daten nicht verfälschend in die Auswertung mit ein.
 	
-	\begin{lstlisting}[caption={Pattern mit Observer }\label{observer_pattern},captionpos=b,language=SQL]
+	\begin{lstlisting}[caption={Pattern mit Observer },label=observer_pattern,captionpos=b,language=SQL]
 	
-	every a = GameActionEvent(action="FOLD") -> b =
-	GameEndEvent(a.playerName != b.playerName)
+	select action, playerName 
+	from pattern[ every a=GameActionEvent(action="FOLD") 
+	-> b=GameEndEvent(a.playerName != b.playerName) ]
 	where timer:within(28800 seconds)
 	
 	\end{lstlisting}
 	
 \end{enumerate}
 
+\section{Consumption Modes mit Pattern}
 
-\section{Partitions}
+Mit Hilfe der Pattern lassen sich in Esper Consumption Modes umsetzen.
+Diese Parameterkontexte werden dazu verwendet, den Lösungsraum je nach Bedarf einzuschränken.
+Hierzu werden verschiedene Kombinationen des \texttt{every}- und des Nachfolgeoperators, sowie die Prädikatenlogik, genutzt.
+Eine Detektion läuft wie folgt ab.
+Der Ereignisstrom wird untersucht. Sobald das \textbf{Initiator-Ereignis}, also das vor dem Nachfolgeoperator deklarierte Event, erfasst wird, startet ein Mustererkenner. Dieser sucht nach dem Event, welches als Bedingung hinter dem Nachfolgeoperator deklariert ist. Wird dieses sogenannte \textbf{Detektor-Ereignis} erkannt, gibt der Mustererkenner eine Lösung zurück. Je nach verwendetem Modus kann der Detektor weiterlaufen, oder abbrechen. Zudem können mehrere Mustererkenner parallel arbeiten, wobei der früher gestartete Vorrang erhält.
+Ereignisse im Ereignisstrom, welche nicht von Relevanz sind werden \textbf{innere Ereignisse} genannt.
+Exakte Erläuterungen zur Prädikatenlogik und damit verbunden logischen Strukturen können \cite{CEP2017}[Anhang 1] entnommen werden.
+Der Quelltext \ref{consumption_modes_pattern} zeigt einen beispielhaften Event-Fluss von Start-Events (S), End-Events (E) und Action-Events (A). Ebenso zeigt er die verschiedenen Konstellationen von Pattern-Deklarationen zur Umsetzung der Consumption Modes. Anschließend wird die Ergebnismenge angegeben, welche vom jeweiligen Pattern selektiert wird.
+
+\begin{lstlisting}[caption={Pattern Deklaration Consumption Modes},label=consumption_modes_pattern,captionpos=b,language=SQL]
+
+// Ereignisstrom:
+// { S1, A1, A2, S2, E1, A3, S3, A4, A5, E2, A6, A7, E3 }
+
+// Continuous
+select *
+from pattern [ every S -> E ]
+// Ergebnismenge: [ {S1, E1}, {S2, E1}, {S3, E2} ]
+
+// Unrestricted
+select *
+from pattern [ every S -> every E ]
+// Ergebnismenge: [ {S1, E1}, {S1, E2}, {S1, E3},
+// {S2, E1}, {S2, E2}, {S2, E3}, {S3, E1}, {S3, E2},
+// {S3, E3} ]
+
+// Recent-Unique
+select *
+from pattern [ every (S -> E) ]
+// Ergebnismenge: [ {S2, E1}, {S3, E2} ]
+
+// Unnamed
+select *
+from pattern [ S -> every E ]
+// Ergebnismenge: [ {S1, E1}, {S1, E2}, {S1, E3} ]
+
+\end{lstlisting}
+Der \textbf{Continuous Consumption-Mode} wird als Pattern mit \texttt{every S -> E} definiert. Dies hat zur Folge, dass der Mustererkenner für jedes auftretende S-Event, das erste darauffolgende E-Event selektiert. 
+Hierbei wird jedes Initiator-Ereignis nur einmal verwendet und startet bei Detektion einen eigenen Mustererkenner, welcher bis zum Detektor-Ereignis läuft.
+Ein Beispiel mit Ergebnis für den Unrestricted Consumption-Mode kann in Quelltext \ref{consumption_modes_pattern} gefunden werden.
+\cite{CEP2017}[40-41]\\
+\absatz
+Mithilfe des \textbf{Unrestricted Consumption-Mode} lässt sich eine uneingeschränkte Ereignisdetektion durchsetzen. von jeden Initiator-Ereignis
+wird ein Mustererkenner gestartet, welcher sämtliche passende Detektor-Ereignisse berücksichtigt. Eine dementsprechende Lösung kann Quelltext \ref{consumption_modes_pattern} entnommen werden.
+\absatz
+Der nächste Modus für die Mustererkennung ist der \textbf{Recent-Unique Consumption-Mode}.
+Wie der Name andeutet, wird hierbei nur das letzte bzw. jüngste Initiator verwendet.
+ein Detektor immern nur zu einem Initiator.
+Immer nur Ein laufender Mustererkenner für jedes Initiator Ereignis neu gestartet.
+Im Gegensatz zum Recent Consumption-Mode wird nicht jedes Detektor Ereignis bis zum nächste Initiator berücksichtigt, sondern einzig das erste.
+
+
+ein Detektor
+
+
+\section{Partitionen}
 
 Esper bietet die Möglichkeit Abfragen zu partitionieren.
 Hierzu wird ein zeitlicher Context mit \texttt{create context} erstellt.
 \texttt{start} definiert den Start-, \texttt{end} den Endzeitpunkt.
-Mit \texttt{after 28800 sec} wir die Dauer dynamisch auf eine Zeitspanne von acht Stunden gesetzt. Verwendet wird der erzeugte Context mit texttt{context OneWorkDay}. Diese Deklaration sorgt dafür, dass sich das darauffolgende \texttt{select}-Statement auf die Partition bezieht.
-In Quellcode \ref{partitioned_pattern} wird mit dem ersten Statement eine achtstündige Partition erstellt. Diese wird in der zweiten Zeile verwendet, um die Spieler- und Spielzugnamen aller Aktionen eines Arbeitstagen zu erfassen.
+Mit \texttt{after} wir die Dauer auf eine Zeitspanne gesetzt. Verwendet wird der erzeugte Context mit texttt{context OneWorkDay}. Diese Deklaration sorgt dafür, dass sich das darauffolgende \texttt{select}-Statement auf die Partition bezieht.
+In Quellcode \ref{partitioned_pattern} wird mit dem ersten Statement eine achtstündige Partition erstellt. Diese wird anschließend durch Angabe vor der Selektion im zweiten Statement verwendet, um die Spieler- und Spielzugnamen aller Aktionen eines Arbeitstagen zu erfassen.
 \cite{EsperRef2018}[18]
 
-\begin{lstlisting}[caption={Partitioniertes Pattern}\label{partitioned_pattern},captionpos=b,language=SQL]
+\begin{lstlisting}[caption={Partitioniertes Pattern},label=partitioned_pattern,captionpos=b,language=SQL]
 
-create context OneWorkDay start @now end after 28800 sec
+// Deklaration Kontext
+create context OneWorkDay
+start @now 
+end after 28800 sec
 
-context OneWorkDay select playerName, action from GameActionEvent
+// Verwendung Kontext
+context OneWorkDay 
+select playerName, action 
+from GameActionEvent
 
 \end{lstlisting}
-
-\section{Kombinierte Statements}
-
