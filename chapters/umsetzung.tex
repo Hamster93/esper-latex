@@ -165,4 +165,10 @@ System.out.println("------> Game action: " + event);
 }
 \end{lstlisting}
 
-Der Listener, in der Abbildung GameActionListener genannt, erhält in der Methode \textbf{update(EventBean[] newData, EventBean[] oldData)} die aktuellen Events als ersten und die vorherigen als zweiten Parameter. Dadurch ist es möglich auf Beziehung zwischen Events zu schließen (Kausalität).
+Der \textbf{UpdateListener}, in der Abbildung GameActionListener genannt, erhält in der Methode \textbf{update(EventBean[] newData, EventBean[] oldData)} die aktuellen Events als ersten und die vorherigen als zweiten Parameter. Dadurch ist es möglich auf Beziehung zwischen Events zu schließen (Kausalität).
+
+Anschließend wird über eine \textbf{System out}-Anweisung die aktuelle Aktion ausgegeben. Sind mehr als 1 Event im ersten Parameter der Methode enthalten, wird nur das erste ausgewertet (Das neuste Element). Die anderen Elemente wurden bereits zuvor abgearbeitet, da der \textbf{UpdateListener}, in diesem Beispiel, auf ein Statement hört, welches ein Length-Window (siehe \ref{LengthWindow}) verwendet, dies ist in der Abbildung nicht dargestellt.
+
+Dies bedeutet auch, dass sich die Logik innerhalb des \textbf{UpdateListener} immer auch auf das gegebene Statement beziehen sollte. Wird z.B. ein Length-Batch-window (siehe \ref{LengthBatchWindow}) verwendet, müssen alle Events verarbeitet werden, wenn der \textbf{UpdateListener} aufgerufen wird, da dies erst geschieht, wenn das Window genau so viele Events wie angegeben enthält. Bei einem Length-Window (siehe \ref{LengthWindow}) muss immer nur das Neuste verarbeitet werden, weil dort der \textbf{UpdateListener} bei jedem Event ausgelöst wird. 
+
+Dies zeigt auch, wie Komplex in Esper die Steuerung der Weiterverarbeitung von Events werden kann. 
