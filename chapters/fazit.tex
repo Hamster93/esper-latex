@@ -1,13 +1,12 @@
 % !TEX encoding = UTF-8 Unicode
 \chapter{Fazit}
-Mit Esper lassen sich auch komplexe Event-Ströme Analysieren und Auswerten. Durch den In-Memory Ansatz, kann dies sehr effizient mit geringen Latenzen realisiert werden,
-da Daten nicht auf der Festplatte bzw. in einer Datenbank gespeichert und wieder ausgelesen werden müssen.
-Wird eine Datenbank benötigt, kann diese über den Esper JDBC-Treiber eingebunden werden. Dies ist praktisch, wenn zu einem späteren Zeitpunkt noch einmal die Event-Daten verarbeitet werden sollen und sie deshalb gespeichert werden müssen.
+Mit Esper lassen sich auch komplexe Event-Ströme analysieren und auswerten. Durch den In-Memory Ansatz, kann dies sehr effizient mit geringen Latenzen realisiert werden, weil Daten nicht auf der Festplatte bzw. in einer Datenbank gespeichert und wieder ausgelesen werden müssen.
 \absatz
 Konzepte wie Data-Windows (siehe \ref{Data-Windows}) erlauben es, eine Kausalität zwischen Events herzustellen.
-Damit ist gemeint, dass nicht nur das aktuelle Event, sondern auch die Events betrachtet werden, welche zum aktuellen Event geführt haben.
+Damit ist gemeint, dass nicht nur das aktuelle Event betrachtet, sondern auch die Events, welche zum aktuellen Event geführt haben.
 \absatz
 In der Umsetzung (siehe \ref{EventsVerarbeiten}) wird aber auch gezeigt, wie komplex die Weiterverarbeitung der Events werden kann. Die eingesetzten Statements und Konzepte wie Data-Windows (siehe \ref{Data-Windows}) spielen dort eine große Rolle.
-Bei der Definition von Statements muss darauf geachtet werden, dass Eigenschaften von Events, nicht in der Camel-Case-Schreibweise definiert werden. Ansonsten werden sie von Esper nicht erkannt und es kommt zu Fehlern bei der Ausführung.
 \absatz
-Ziel dieser Ausarbeitung war es, eine Einführung in Esper zu geben und die Grundlegenden Konzepte zu erläutern. Dieses Ziel wurde nach Meinung der Autoren erreicht, in der Arbeit werden die grundlegenden Konzepte von Esper erläutert und eine Anleitung für den Einsatz beschrieben.
+Ziel dieser Ausarbeitung war es, eine Einführung in Esper zu geben und die grundlegenden Konzepte zu erläutern. Dieses Ziel wurde nach Meinung der Autoren erreicht. In der Arbeit werden die grundlegenden Konzepte von Esper erklärt und eine Anleitung für den Einsatz beschrieben.
+\absatz
+Anzumerken ist jedoch, dass Erfahrung im Bereich der Softwareentwicklung hilfreich ist, um sich in Esper zurechtzufinden.

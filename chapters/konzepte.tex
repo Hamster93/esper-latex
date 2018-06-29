@@ -1,7 +1,7 @@
 % !TEX encoding = UTF-8 Unicode
 \chapter{Konzepte}
 Die Konzepte welche Esper verwendet, dienen dazu, den kompletten Ereignisfluss von der Aktion bis zur Verarbeitung und nachfolgenden Aktionen, abzubilden.
-Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Ereignismuster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. 
+Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Ereignismuster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. 
 Wie die Konfiguration, mit Ereignisdefinition-, Registrierung, sowie das Feuern und Verarbeiten der Ereignisse, in Esper umgesetzt wird, ist in Kapitel \ref{kapitel_architektur} beschrieben.
 Nähere Informationen zu den Konzepten und weitere, in dieser Arbeit nicht näher erläuterten Möglichkeiten von Esper, sind in der offiziellen Dokumentation \cite{EsperRef2018} einsehbar.
 \absatz
@@ -31,7 +31,7 @@ Der nachfolgend dargestellte Quelltext \ref{basic_select} zeigt ein einfaches Se
 select * from GameActionEvent
 
 \end{lstlisting}
-Hierdurch reagiert der \acf{EP} auf alle Ereignisse vom Typ \texttt{GameActionEvent} und  erfasst diese beim Auftreten. 
+Hierdurch reagiert der \acf{EP} auf alle Ereignisse vom Typ \\ \texttt{GameActionEvent} und  erfasst diese beim Auftreten. 
 In Abbildung \ref{basic_select_img} ist der Ablauf dargestellt. Ereignisse werden unverändert weitergegeben. Dieses Statement wird im Casino eingesetzt, um über sämtliche Spielzüge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse detaillierter untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
 \cite{EsperRef2018}[8-9]
 
@@ -51,9 +51,9 @@ select playerName, deck from GameEndEvent(deck="ROYAL_FLUSH")
 
 \end{lstlisting}
 Wie der Quellcode \ref{filter_select} zeigt, selektiert die Event-Engine die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent}. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
-
+\absatz
 Der Ablauf des Quellcodes wird in Abbildung \ref{filter_select_img} aufgezeigt. Gut zu sehen ist, dass nur die End-Events erfasst werden, welche dem Attribut-Wert entsprechen. Weil nur ein Spieler mit einem Royal-Flush-Blatt gewinnt, wird auch nur dieses Ereignis verarbeitet.
-Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen hat. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
+Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen hat. Um jedoch einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten mit weiteren Funktionen aggregiert werden.
 \cite{EsperRef2018}[10-11]
 
 \begin{figure}[ht]
@@ -88,62 +88,51 @@ Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysieren
 \label{Data-Windows}
 
 \textbf{Data-Windows} werden in Esper verwendet, um Events im Bezug zueinander zu betrachten (Kausalität). Je nach Eigenschaft des \textbf{Data-Windows}, werden sie anhand von Kriterien (z.B. Anzahl oder Zeit) betrachtet.
-
 Ein sehr einfaches \textbf{Data-Window} ist das nachfolgend dargestellte \textbf{Length Window}.
-
+\absatz
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{images/data_window_length.png}
 	\caption{Length Window}
 	\label{LengthWindow}
 \end{figure}
-
 Dieses \textbf{Data-Window} wird mit einer Länge konfiguriert (in der Abbildung, ist der Wert 2), welche angibt, wie viele Events zusätzlich zum aktuellen betrachtet werden sollen. In diesem Fall würde das aktuelle und vorherige Event betrachtet werden.
-
 Die Art des Events wird im Statement angegeben. Für das obige Beispiel könnte dies folgendermaßen aussehen:
-
 \begin{lstlisting}[caption={Statement mit Length Window},label=length_select,captionpos=b,language=SQL]
 
 select * from GameActionEvent.win:length(2)
 
 \end{lstlisting}
-
 Wichtig ist an dieser Stelle anzumerken, dass das Statement des \textbf{Length Windows} erfüllt ist, sobald mindestens ein Event vom Typ \textbf{GameActionEvent} vorhanden ist. Dabei spielt die angegebene Länge keine Rolle. Nur wenn der Event-Strom mehrere passende Events beinhaltet, wird das \textbf{Length Window} ''gefüllt'' bis zu seiner maximalen Länge.
-
 Ein \textbf{Data-Window} mit einem anderen Ansatz, ist das \textbf{Length-Batch Window}:
-
+\absatz
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{images/data_window_length_batch.png}
 	\caption{Length-Batch Window}
 	\label{LengthBatchWindow}
 \end{figure}
-
 Dieses \textbf{Data-Window} verhält sich fast identisch zum \textbf{Length Window}, wird allerdings erst erfüllt, wenn genau so viele oder mehr Events im Event-Strom vorhanden sind, wie als Länge des \textbf{Data Windows} angegeben. Dadurch ist es möglich, Abfragen zu erstellen, die zuerst eine gewisse Anzahl an Events benötigen, um eine sinnvolle Weiterverarbeitung zu gewährleisten.
-
-Neben dem Betrachten der Anzahl von Events als Kriterium, gibt es die Möglichkeit der zeitlichen Auswertung. Ein Beispiel hierfür ist das \textbf{Time Window}:
-
+\absatz
+Neben dem betrachten der Anzahl von Events als Kriterium, gibt es auch die Möglichkeit der zeitlichen Betrachtung. Ein Beispiel hierfür ist das \textbf{Time Window}:
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{images/data_window_time.png}
 	\caption{Time Window}
 	\label{TimeWindow}
 \end{figure}
-
 Bei diesem \textbf{Data-Window} werden alle Events innerhalb des konfigurierten Zeitabschnittes betrachtet.
 Dabei wird stets vom aktuellen Zeitpunkt aus, anhand des angegeben Zeitwertes (z.B. 5 Sekunden), in die Vergangenheit gegangen. In anderen Worten, würden wir als Ergebnis das aktuelle Event erhalten und alle Events die bis zu 5 Sekunden vorher stattgefunden haben.
-
-Zuletzt gibt es auch ein \textbf{Data-Window} ohne Kriterium, das \textbf{Keep-All Window}:
-
+\absatz
+Zu Letzt gibt es auch ein \textbf{Data-Window} ohne Kriterium, das \textbf{Keep-All Window}:
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{images/data_window_keep_all.png}
 	\caption{Keep-All Window}
 	\label{KeepAllWindow}
 \end{figure}
-
 Dieses \textbf{Data-Window} ist erfüllt, sobald das erste Event im Event-Storm auftaucht. Es werden beliebig viele Events gesammelt und im Speicher gehalten.
-Aufgrund von dem hohen Speicherverbrauch sollte dieses nur eingesetzt werden, wenn eine kleine Event-Menge vorliegt und diese gesamt Betracht werden sollen.
+Aufgrund von dem hohen Speicherverbrauch, sollte dieses nur eingesetzt werden, wenn eine kleine Event-Menge vorliegt und diese Gesamt Betracht werden sollen.
 
 \section{Patterns}
 
@@ -186,7 +175,7 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	
 	\item \textbf{Bedingungen:}
 	Um Grenzen zu definieren, nach welcher das Pattern geprüft wird, dient die \texttt{where}-Klausel. Nach ihr können verschiedene Bedingungen, durch Konstellationen der Operatoren, angegeben werden.
-	Meistens werden Vergleichsoperatoren wie \texttt{=, < , > , >=, <=, !=, <>, is null, is not null} und logische Kombinationen wie \texttt{and} oder \texttt{or} verwendet. Ereignisse können hiermit in Korrelation gestellt und ausgewertet werden. Die \texttt{where}- Klausel kann auch bei der Selektion verwendet werden.
+	Meisten werden Vergleichsoperatoren wie \texttt{=, < , > , >=, <=, !=, <>, is null, is not null} und logische Kombinationen wie \texttt{and} oder \texttt{or} verwendet. Ereignisse können hiermit in Korrelation gestellt und ausgewertet werden. Die \texttt{where}- Klausel kann auch bei der Selektion verwendet werden.
 	
 	\item \textbf{Überwacher} (engl. Observer):
 	Um Ereignisströme zu überwachen werden Observer verwendet, welche beispielsweise in einem Zeitintervall oder zu einem Zeitpunkt agieren. Sie können nach der \texttt{where}-Klausel angegeben werden. Beispielsweise kann ein Timer mit Intervall, durch \texttt{timer:interval} definiert werden. Ein Zeitpunkt wird mit \texttt{timer:at} festgelegt, eine Zeitspanne mit \texttt{timer:within}. Für das Casino wird der Überwacher auf ein Zeitintervall eines Werktages gesetzt, um nur die Ereignisse des aktuellen Tages zu erhalten. Historischen Daten fließen somit nicht verfälschend in die Auswertung mit ein.
@@ -196,7 +185,7 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	select action, playerName 
 	from pattern[ every a=GameActionEvent(action="FOLD") 
 	-> b=GameEndEvent(a.playerName != b.playerName)
-	where timer:within(28800 seconds)]
+	where timer:within(28800 seconds) ]
 	
 	\end{lstlisting}
 	
@@ -264,7 +253,7 @@ Während der Detektion existiert nur ein Mustererkenner, welcher erst bei einem 
 Esper bietet die Möglichkeit Abfragen zu partitionieren.
 Hierzu wird ein zeitlicher Context mit \texttt{create context} erstellt.
 \texttt{start} definiert den Start-, \texttt{end} den Endzeitpunkt.
-Mit \texttt{after} wir die Dauer auf eine Zeitspanne gesetzt. Verwendet wird der erzeugte Context mit texttt{context OneWorkDay}. Diese Deklaration sorgt dafür, dass sich das darauffolgende \texttt{select}-Statement auf die Partition bezieht.
+Mit \texttt{after} wir die Dauer auf eine Zeitspanne gesetzt. Verwendet wird der erzeugte Context mit \texttt{context OneWorkDay}. Diese Deklaration sorgt dafür, dass sich das darauffolgende \texttt{select}-Statement auf die Partition bezieht.
 In Quellcode \ref{partitioned_pattern} wird mit dem ersten Statement eine achtstündige Partition erstellt. Diese wird anschließend durch Angabe vor der Selektion im zweiten Statement verwendet, um die Spieler- und Spielzugnamen aller Aktionen eines Arbeitstagen zu erfassen.
 \cite{EsperRef2018}[18]
 

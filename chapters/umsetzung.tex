@@ -6,7 +6,7 @@ In diesem Kapitel wird beschrieben, wie Esper installiert werden kann. Anschlie�
 Für die Installation von Esper wird in dieser Ausarbeitung des Build-Tool \textbf{Apache Maven} verwendet. 
 Dieses ermöglicht das automatisierte Herunterladen der Esper-Engine. Hierzu wird eine Konfigurationsdatei für Maven benötigt, die sogenannte \textbf{pom.xml}. Nachfolgend wird diese für das Szenario dargestellt:
 
-\begin{lstlisting}[caption={Maven-Konfiguration}\label{lst:mavenKonfiguration},captionpos=t,language=XML]
+\begin{lstlisting}[caption={Maven-Konfiguration}\label{lst:mavenKonfiguration},captionpos=b,language=XML]
 
 <?xml version="1.0" encoding="UTF-8"?>
     <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -38,16 +38,13 @@ Nach dem Download kann die Esper-Engine direkt bei der Entwicklung einer Java-An
 Dieses Kapitel beinhaltet die einzelnen Schritte der Implementierung des Szenarios (beschrieben in Kapitel \ref{Szenario}). Zu beginn werden die erzeugten Event-Klassen beschrieben, anschließend wird das Versenden der Events und deren Verarbeitung behandelt.
 
 \subsection{Event-Klassen}
-
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=\textwidth,height=\textheight,keepaspectratio]{images/Events.png}
 	\caption{Event Klassen des Szenarios}
 	\label{EventKlassen}
 \end{figure}
-
-Um das Szenario abzubilden werden verschiedene Event-Klassen benötigt. Mit diesem Begriff sind Klassen gemeint, die ein Event darstellen.
-Als gemeinsame Basis dient die Event-Klasse \textbf{BaseEvent} (Siehe Abbildung \ref{EventKlassen}). Dieses Event beinhaltet den Spieler-Namen und einen Zeitstempel. Diese beiden Felder werden in allen Events benötigt.
+Um das Szenario abzubilden werden verschiedene Event-Klassen benötigt. Mit diesem Begriff sind Klassen gemeint, die ein Event darstellen. Als gemeinsame Basis dient die Event-Klasse \textbf{BaseEvent} (Siehe Abbildung \ref{EventKlassen}). Dieses Event beinhaltet den Spieler-Namen und einen Zeitstempel. Diese beiden Felder werden in allen Events benötigt.
 \absatz
 Die Event-Klassen \textbf{GameStartEvent} und \textbf{GameEndEvent} bilden den Start und das Ende einer Poker-Partie ab. Zu Beginn (\textbf{GameStartEvent}) werden alle Spiel-Teilnehmer benötigt, gegen Ende (\textbf{GameEndEvent}) das Preisgeld und Kartendeck, welches gewonnen hat. Da beide Events von \textbf{BaseEvent} erben, besitzen sie automatisch einen Zeitstempel und den zugeordneten Spieler. Beim Spielstart wird der Name des ersten Spielers verwendet.
 \absatz
@@ -56,20 +53,19 @@ Im Laufe der Partie werden verschiedene Aktionen der Spieler durchgeführt. Dies
 \subsection{Architektur}
 \label{kapitel_architektur}
 Die nachfolgende Abbildung zeigt die Architektur von Esper. Dabei ist sie, auf die in der Umsetzung benötigten Komponenten, beschränkt.
-
 \begin{figure}[ht]
 	\centering
 	\includegraphics{images/Architektur.png}
 	\caption{Architektur von Esper}
-	\label{architektur}
+	\label{architektur}	
 \end{figure}
-
+\absatz
 Die \textbf{Configuration}-Klasse wird verwendet, um die Esper-Engine zu konfigurieren. Unter anderem lassen sich dort die Event-Typen registrieren, die verarbeitet werden sollen. Neben den Event-Typen, gibt es die Möglichkeit Plugins zu registrieren. 
 \absatz
 Durch Plugins werden benutzerdefinierte Funktionen eingebunden (z.B für den Vergleich von Geo-Koordinaten).
 Nachfolgend zeigt die Basis-Konfiguration der Umsetzung:
-
-\begin{lstlisting}[caption={Basis-Konfiguration}\label{lst:basisKonfiguration},captionpos=t,language=JAVA]
+\absatz
+\begin{lstlisting}[caption={Basis-Konfiguration}\label{lst:basisKonfiguration},captionpos=b,language=JAVA]
 
 import com.espertech.esper.client.Configuration
 import de.htwg.da.esper.sample.event.GameActionEvent;
@@ -128,7 +124,8 @@ public final class EventGenerator {
   }
 
   private static GameActionType randomGameActionType() {
-    int gameActionTypeIndex = GENERATOR.nextInt(GameActionType.values().length);
+    int gameActionTypeIndex = 
+    	GENERATOR.nextInt(GameActionType.values().length);
     return GameActionType.values()[gameActionTypeIndex];
   }
 
@@ -143,8 +140,8 @@ public final class EventGenerator {
     return new Date(timeStamp);
   }
 }
-\end{lstlisting}
 
+\end{lstlisting}
 Zur besseren Übersichtlichkeit sind nicht alle Methoden im Quellcode \ref{eventGenerator} enthalten.
 Gezeigt wird, dass über den Aufruf der Methode \textbf{randomGameActionEvent()} ein zufälliges \textbf{GameActionEvent} erzeugt wird. Hierzu werden für das zu erzeugende Event ein zufälliger Spieler-Name, Zeitstempel und Aktionstyp generiert. Die möglichen Werte können konfiguriert werden. Im obigen Beispiel sind dies ''Clemens'', ''Lukas'' und ''Kathrin'' als Spieler-Namen, die aktuelle Zeit als Zeitstempel und ein zufälliger Aktionstyp aus den möglichen Aktionen in Poker.
 
@@ -161,11 +158,16 @@ Object event = newData[0].getUnderlying();
 System.out.println("------> Game action: " + event);
 }
 }
-\end{lstlisting}
 
+\end{lstlisting}
 Der \textbf{UpdateListener}, in der Abbildung GameActionListener genannt, erhält in der Methode \textbf{update(EventBean[] newData, EventBean[] oldData)} die aktuellen Events als ersten und die vorherigen als zweiten Parameter. Dadurch ist es möglich auf Beziehung zwischen Events zu schließen (Kausalität).
 \absatz
 Anschließend wird über eine \textbf{System out}-Anweisung die aktuelle Aktion ausgegeben. Sind mehr als 1 Event im ersten Parameter der Methode enthalten, wird nur das erste ausgewertet (Das neuste Element). Die anderen Elemente wurden bereits zuvor abgearbeitet, da der \textbf{UpdateListener}, in diesem Beispiel, auf ein Statement hört, welches ein Length-Window (siehe \ref{LengthWindow}) verwendet, dies ist in der Abbildung nicht dargestellt.
 \absatz
 Dies bedeutet auch, dass sich die Logik innerhalb des \textbf{UpdateListener} immer auch auf das gegebene Statement beziehen sollte. Wird z.B. ein Length-Batch-window (siehe \ref{LengthBatchWindow}) verwendet, müssen alle Events verarbeitet werden, wenn der \textbf{UpdateListener} aufgerufen wird, da dies erst geschieht, wenn das Window genau so viele Events wie angegeben enthält. Bei einem Length-Window (siehe \ref{LengthWindow}) muss immer nur das Neuste verarbeitet werden, weil dort der \textbf{UpdateListener} bei jedem Event ausgelöst wird. 
 Dies zeigt auch, wie Komplex in Esper die Steuerung der Weiterverarbeitung von Events werden kann. 
+
+\section{Quellcode}
+
+Die im Kontext dieser Arbeit erstellte Beispiel-Anwendung, kann unter dem Link \url{https://github.com/AbgespaceterTyp/EsperSample} bezogen werden.
+Sie repräsentiert eine beispielhafte Umsetzung der erläuterten Strukturen und Möglichkeiten von Esper.
