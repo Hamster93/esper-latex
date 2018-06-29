@@ -51,7 +51,7 @@ Die Filterfunktion ist eine geeignete Möglichkeit, die Selektion aus dem Ereign
 select playerName, deck from GameEndEvent(deck="ROYAL_FLUSH")
 
 \end{lstlisting}
-Der Quellcode zeigt, wie die Event-Engine die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent} selektiert. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
+Der Quellcode zeigt, wie die Event-Engine, die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent} selektiert. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
 Der Ablauf des Quellcodes wird in Abbildung \ref{filter_select_img} grafisch aufgezeigt. Gut zu sehen, ist, dass nur die End-Events erfasst werden, welche dem Attribut-Wert entsprechen. Weil nur ein Spieler mit einem Royal-Flush-Blatt gewinnt, wird auch nur dieses Ereignis verarbeitet.
 Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen wird. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
 \cite{EsperRef2018}[10-11]
@@ -72,8 +72,8 @@ select playerName, count(playerName) as wins, deck from GameEndEvent
 \end{lstlisting}
 Der Ablauf hierbei ist in Abbildung \ref{aggregation_select_img} veranschaulicht. 
 Zudem sind weitere Aggregationsfunktionen in Esper verfügbar.
-So können die Ereignisse mit \texttt{sum()} summiert werden. Der Durchschnitt wird durch \texttt{avg()}, Minimal-, sowie Maximalwert mit \texttt{min()} und \texttt{max()} errechnet. \texttt{count()} gibt die Anzahl der Auftretenden Ereignisse. Mit \texttt{median()}, \texttt{stddev()}, \texttt{avedev()} wird der Median, die Standardabweichung, und die Abweichung zum Mittelwert errechnet.
-Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysierenden Daten befinden. Um nur die Daten des aktuellen Tages auswerten zu können, sind Beschränkungen des auszuwertenden Ereignisstroms erforderlich. Die \acf{EPL} bietet hierfür sogenannte Data-Windows.
+Ereignisse können mit \texttt{sum()} summiert werden. Der Durchschnitt wird durch \texttt{avg()}, Minimal-, sowie Maximalwert mit \texttt{min()} und \texttt{max()} errechnet. \texttt{count()} gibt die Anzahl der Auftretenden Ereignisse. Mit \texttt{median()}, \texttt{stddev()}, \texttt{avedev()} wird der Median, die Standardabweichung, und die Abweichung zum Mittelwert errechnet.
+Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysierenden Daten befinden. Um nur die Daten des aktuellen Tages auswerten zu können, sind Beschränkungen des auszuwertenden Ereignisstroms erforderlich. Die \acf{EPL} bietet hierfür sogenannte Data-Windows, welche in Abschnitt \ref{Data-Windows} beschrieben werden.
 \cite{EsperRef2018}[9-10]
 
 \begin{figure}[ht]
@@ -88,7 +88,7 @@ Im Casino fällt auf, dass sich die Spielenden der Vortage in den zu analysieren
 
 \textbf{Data-Windows} werden in Esper verwendet, um Events im Bezug zueinander zu betrachten (Kausalität). Je nach Eigenschaft des \textbf{Data-Windows}, werden sie anhand von Kriterien (z.B. Anzahl oder Zeit) betrachtet.
 
-Ein sehr einfaches \textbf{Data-Window} ist das nachfolgend dargestellte \textbf{Length Window}: 
+Ein sehr einfaches \textbf{Data-Window} ist das nachfolgend dargestellte \textbf{Length Window}.
 
 \begin{figure}[ht]
 	\centering
@@ -146,11 +146,11 @@ Aufgrund von dem hohen Speicherverbrauch, sollte dieses nur eingesetzt werden, w
 
 \section{Patterns}
 
-Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogenannte Patterns dar. Events, welche den Bedingungen entsprechen werden erfasst. Hierbei kommen verschiedene Elemente bei der Pattern-Definition zum Einsatz.
+Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogenannte Patterns dar. Events, welche den Bedingungen entsprechen, werden erfasst. Hierbei kommen verschiedene Elemente bei der Pattern-Definition zum Einsatz.
 \cite{EsperRef2018}[25]
 
 \begin{enumerate}
-	\item \textbf{Kontrolloperator:} \texttt{every} definiert die Erstellung eines Pattern und regelt die Abarbeitung. Es wird alle(engl. every) auf das Ereignismuster zutreffende Ereignisse erfasst. Ein simples Pattern, welches alle Ereignisse vom Typ \texttt{GameActionEvent} erfasst, kann Quellcode \ref{basic_pattern} entnommen werden.
+	\item \textbf{Kontrolloperator:} \texttt{every} definiert die Erstellung eines Pattern und regelt die Abarbeitung. Es wird alle(engl. every) auf das Ereignismuster zutreffende Ereignisse erfasst. Ein simples Pattern, welches alle Ereignisse vom Typ \texttt{GameActionEvent} erfasst, kann dem nachfolgenden Quellcode entnommen werden.
 	Mit der \texttt{where}-Klausel können wie bei der Selektion weitere Bedingungen, definiert werden.
 	
 	\begin{lstlisting}[caption={Einfaches Pattern mit Where-Klausel}\label{basic_pattern}, captionpos=b,language=SQL]
@@ -160,7 +160,7 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	\end{lstlisting}
 	
 	\item \textbf{Logische Operatoren:} 
-	Das Pattern kann, wie in Quellcode \ref{logic_pattern} veranschaulicht, durch logische Operatoren wie \texttt{and, or , not} zusammengesetzt werden. So kann wie in Quellcode \ref{logic_pattern} das Ereignismuster mit Bedingungen bestückt werden. In diesem Beispiel würden Events vom Typ \texttt{GameEnd} oder vom Typ \texttt{GameAction} erfasst werden.
+	Das Pattern kann, wie im unten dargestellten Quellcode veranschaulicht, durch logische Operatoren wie \texttt{and, or , not} zusammengesetzt werden. Dadurch kann das Ereignismuster mit Bedingungen versehen werden. In diesem Beispiel würden Events vom Typ \texttt{GameEndEvent} oder vom Typ \texttt{GameActionEvent} erfasst werden.
 	
 	\begin{lstlisting}[caption={Pattern mit logischen Operatoren}\label{logic_pattern},captionpos=b,language=SQL]
 	
