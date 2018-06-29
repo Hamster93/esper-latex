@@ -31,7 +31,7 @@ Der nachfolgend dargestellte Quelltext \ref{basic_select} zeigt ein einfaches Se
 select * from GameActionEvent
 
 \end{lstlisting}
-Dabei wird der \acf{EP} auf alle Ereignisse vom Typ \texttt{GameActionEvent} reagieren und diese bei Eintritt erfassen. 
+Hierdurch reagiert der \acf{EP} auf alle Ereignisse vom Typ \texttt{GameActionEvent} und  erfasst diese beim Auftreten. 
 In Abbildung \ref{basic_select_img} ist der Ablauf dargestellt. Ereignisse werden unverändert weitergegeben. Dieses Statement wird im Casino eingesetzt, um über sämtliche Spielzüge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse detaillierter untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
 \cite{EsperRef2018}[8-9]
 
@@ -195,8 +195,8 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	
 	select action, playerName 
 	from pattern[ every a=GameActionEvent(action="FOLD") 
-	-> b=GameEndEvent(a.playerName != b.playerName) ]
-	where timer:within(28800 seconds)
+	-> b=GameEndEvent(a.playerName != b.playerName)
+	where timer:within(28800 seconds)]
 	
 	\end{lstlisting}
 	
