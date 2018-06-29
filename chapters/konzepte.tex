@@ -53,7 +53,7 @@ select playerName, deck from GameEndEvent(deck="ROYAL_FLUSH")
 Wie der Quellcode \ref{filter_select} zeigt, selektiert die Event-Engine die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent}. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
 
 Der Ablauf des Quellcodes wird in Abbildung \ref{filter_select_img} aufgezeigt. Gut zu sehen ist, dass nur die End-Events erfasst werden, welche dem Attribut-Wert entsprechen. Weil nur ein Spieler mit einem Royal-Flush-Blatt gewinnt, wird auch nur dieses Ereignis verarbeitet.
-Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen wird. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
+Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen hat. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
 \cite{EsperRef2018}[10-11]
 
 \begin{figure}[ht]
@@ -121,7 +121,7 @@ Ein \textbf{Data-Window} mit einem anderen Ansatz, ist das \textbf{Length-Batch 
 
 Dieses \textbf{Data-Window} verhält sich fast identisch zum \textbf{Length Window}, wird allerdings erst erfüllt, wenn genau so viele oder mehr Events im Event-Strom vorhanden sind, wie als Länge des \textbf{Data Windows} angegeben. Dadurch ist es möglich, Abfragen zu erstellen, die zuerst eine gewisse Anzahl an Events benötigen, um eine sinnvolle Weiterverarbeitung zu gewährleisten.
 
-Neben dem betrachten der Anzahl von Events als Kriterium, gibt es auch die Möglichkeit der zeitlichen Betrachtung. Ein Beispiel hierfür ist das \textbf{Time Window}:
+Neben dem Betrachten der Anzahl von Events als Kriterium, gibt es die Möglichkeit der zeitlichen Auswertung. Ein Beispiel hierfür ist das \textbf{Time Window}:
 
 \begin{figure}[ht]
 	\centering
@@ -133,7 +133,7 @@ Neben dem betrachten der Anzahl von Events als Kriterium, gibt es auch die Mögl
 Bei diesem \textbf{Data-Window} werden alle Events innerhalb des konfigurierten Zeitabschnittes betrachtet.
 Dabei wird stets vom aktuellen Zeitpunkt aus, anhand des angegeben Zeitwertes (z.B. 5 Sekunden), in die Vergangenheit gegangen. In anderen Worten, würden wir als Ergebnis das aktuelle Event erhalten und alle Events die bis zu 5 Sekunden vorher stattgefunden haben.
 
-Zu Letzt gibt es auch ein \textbf{Data-Window} ohne Kriterium, das \textbf{Keep-All Window}:
+Zuletzt gibt es auch ein \textbf{Data-Window} ohne Kriterium, das \textbf{Keep-All Window}:
 
 \begin{figure}[ht]
 	\centering
@@ -143,7 +143,7 @@ Zu Letzt gibt es auch ein \textbf{Data-Window} ohne Kriterium, das \textbf{Keep-
 \end{figure}
 
 Dieses \textbf{Data-Window} ist erfüllt, sobald das erste Event im Event-Storm auftaucht. Es werden beliebig viele Events gesammelt und im Speicher gehalten.
-Aufgrund von dem hohen Speicherverbrauch, sollte dieses nur eingesetzt werden, wenn eine kleine Event-Menge vorliegt und diese Gesamt Betracht werden sollen.
+Aufgrund von dem hohen Speicherverbrauch sollte dieses nur eingesetzt werden, wenn eine kleine Event-Menge vorliegt und diese gesamt Betracht werden sollen.
 
 \section{Patterns}
 
@@ -186,7 +186,7 @@ Eine Alternative zu den Select-Satements stellen Abfragen nach Strukturen, sogen
 	
 	\item \textbf{Bedingungen:}
 	Um Grenzen zu definieren, nach welcher das Pattern geprüft wird, dient die \texttt{where}-Klausel. Nach ihr können verschiedene Bedingungen, durch Konstellationen der Operatoren, angegeben werden.
-	Meisten werden Vergleichsoperatoren wie \texttt{=, < , > , >=, <=, !=, <>, is null, is not null} und logische Kombinationen wie \texttt{and} oder \texttt{or} verwendet. Ereignisse können hiermit in Korrelation gestellt und ausgewertet werden. Die \texttt{where}- Klausel kann auch bei der Selektion verwendet werden.
+	Meistens werden Vergleichsoperatoren wie \texttt{=, < , > , >=, <=, !=, <>, is null, is not null} und logische Kombinationen wie \texttt{and} oder \texttt{or} verwendet. Ereignisse können hiermit in Korrelation gestellt und ausgewertet werden. Die \texttt{where}- Klausel kann auch bei der Selektion verwendet werden.
 	
 	\item \textbf{Überwacher} (engl. Observer):
 	Um Ereignisströme zu überwachen werden Observer verwendet, welche beispielsweise in einem Zeitintervall oder zu einem Zeitpunkt agieren. Sie können nach der \texttt{where}-Klausel angegeben werden. Beispielsweise kann ein Timer mit Intervall, durch \texttt{timer:interval} definiert werden. Ein Zeitpunkt wird mit \texttt{timer:at} festgelegt, eine Zeitspanne mit \texttt{timer:within}. Für das Casino wird der Überwacher auf ein Zeitintervall eines Werktages gesetzt, um nur die Ereignisse des aktuellen Tages zu erhalten. Historischen Daten fließen somit nicht verfälschend in die Auswertung mit ein.
