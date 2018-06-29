@@ -28,10 +28,10 @@ Dieses ermöglicht das automatisierte Herunterladen der Esper-Engine. Hierzu wir
          </dependency>
      </dependencies>
 </project>
+
 \end{lstlisting}
-
 Wichtig ist hierbei das XML-Element \textbf{<dependencies>} welche die Abhängigkeiten enthält. Diese werden automatisch heruntergeladen, sobald Maven ausgeführt wird. In der Beispiel-Konfiguration gibt es nur eine Abhängigkeit, die für Esper.
-
+\absatz
 Nach dem Download kann die Esper-Engine direkt bei der Entwicklung einer Java-Anwendung verwendet werden. Für andere Sprachen, sind unter Umständen Build-Tools zu verwenden, welche hier nicht beschrieben werden.
 
 \section{Implementierung}
@@ -48,9 +48,9 @@ Dieses Kapitel beinhaltet die einzelnen Schritte der Implementierung des Szenari
 
 Um das Szenario abzubilden werden verschiedene Event-Klassen benötigt. Mit diesem Begriff sind Klassen gemeint, die ein Event darstellen.
 Als gemeinsame Basis dient die Event-Klasse \textbf{BaseEvent} (Siehe Abbildung \ref{EventKlassen}). Dieses Event beinhaltet den Spieler-Namen und einen Zeitstempel. Diese beiden Felder werden in allen Events benötigt.
-
+\absatz
 Die Event-Klassen \textbf{GameStartEvent} und \textbf{GameEndEvent} bilden den Start und das Ende einer Poker-Partie ab. Zu Beginn (\textbf{GameStartEvent}) werden alle Spiel-Teilnehmer benötigt, gegen Ende (\textbf{GameEndEvent}) das Preisgeld und Kartendeck, welches gewonnen hat. Da beide Events von \textbf{BaseEvent} erben, besitzen sie automatisch einen Zeitstempel und den zugeordneten Spieler. Beim Spielstart wird der Name des ersten Spielers verwendet.
-
+\absatz
 Im Laufe der Partie werden verschiedene Aktionen der Spieler durchgeführt. Diese sind durch die Event-Klasse \textbf{GameActionEvent} abgebildet. Das Event beinhaltet ein Feld für die Aktionsart (z.B. "rise", wenn ein Spieler erhöht hat).
 
 \subsection{Architektur}
@@ -65,7 +65,7 @@ Die nachfolgende Abbildung zeigt die Architektur von Esper. Dabei ist sie, auf d
 \end{figure}
 
 Die \textbf{Configuration}-Klasse wird verwendet, um die Esper-Engine zu konfigurieren. Unter anderem lassen sich dort die Event-Typen registrieren, die verarbeitet werden sollen. Neben den Event-Typen, gibt es die Möglichkeit Plugins zu registrieren. 
-
+\absatz
 Durch Plugins werden benutzerdefinierte Funktionen eingebunden (z.B für den Vergleich von Geo-Koordinaten).
 Nachfolgend zeigt die Basis-Konfiguration der Umsetzung:
 
@@ -82,29 +82,26 @@ Configuration config = new Configuration();
 config.addEventType("GameStart",GameStartEvent.class.getName());
 config.addEventType("Action", GameActionEvent.class.getName());
 config.addEventType("GameEnd", GameEndEvent.class.getName());
+
 \end{lstlisting}
-
 In der Konfiguration werden die Event-Typen \textbf{GameStartEvent}, \textbf{GameActionEvent} und \textbf{GameEndEvent} registriert. Plugins werden nicht verwendet.
-
 Über die \textbf{EPServiceProviderManager}-Klasse kann der \textbf{EPServiceProvider} erhalten werden:
 
-\begin{lstlisting}[caption={EPServiceProvider}\label{lst:epServiceProvider},captionpos=t,language=JAVA]
+\begin{lstlisting}[caption={EPServiceProvider}\label{lst:epServiceProvider},captionpos=b,language=JAVA]
 
 import com.espertech.esper.client.*;
 
 EPServiceProvider cep = EPServiceProviderManager.
 getProvider("MyEsperProvider", config);
+
 \end{lstlisting}
-
-
 Der erste Parameter stellt eine eindeutige Bezeichnung für den Provider dar. Dadurch ist es möglich, mehrere \textbf{EPServiceProvider} und damit mehr als eine Esper-Engine parallel zu verwenden. Als zweiter Parameter wird die zuvor  erstellte Konfiguration (siehe Quelltext \ref{lst:basisKonfiguration}) verwendet.
-
 Der \textbf{EPServiceProvider} hält die Referenzen auf die Klassen \textbf{EPAdministrator} und \textbf{EPRuntime}. 
 
 \subsection{Events versenden}
 Für das Versenden eines Events wird die Methode \textbf{sendEvent(...)} der Klasse \textbf{EPRuntime} verwendet (siehe Abbildung \ref{architektur}). Als Parameter kann eine beliebige Event-Klasse übergeben werden, wie nachfolgend mit einem \textbf{GameStartEvent} dargestellt:
 
-\begin{lstlisting}[caption={Event versenden}\label{lst:fireEvent},captionpos=t,language=Java]
+\begin{lstlisting}[caption={Event versenden}\label{lst:fireEvent},captionpos=b,language=Java]
 
 EPServiceProvider cep = EPServiceProviderManager.
 			getProvider("MyEsperProvider",esperConfig);
@@ -118,7 +115,7 @@ cepRT.sendEvent(new GameStartEvent());
 \subsection{Events generieren}
 Damit die Events für das Szenario einfach erzeugt und versendet werden können, wird eine Hilfs-Klasse (\textbf{EventGenerator}) verwendet. Dieser ist zuständig für die Generierung von Beispiel-Events (z.B. \textbf{GameActionEvent}).
 
-\begin{lstlisting}[caption={Event Generator}\label{eventGenerator},captionpos=t,language=Java]
+\begin{lstlisting}[caption={Event Generator}\label{eventGenerator},captionpos=b,language=Java]
 public final class EventGenerator {
   private static String[] PLAYER_NAMES = {"Clemens", "Lukas", "Kathrin"};
   private static Random GENERATOR = new Random();
@@ -155,7 +152,7 @@ Gezeigt wird, dass über den Aufruf der Methode \textbf{randomGameActionEvent()}
 \label{EventsVerarbeiten}
 Für das Verarbeiten von Events wird ein Statement (siehe Kapitel \ref{statements}) benötigt, um die gewünschten auszuwählen und ein UpdateListener, um es anschließend zu verarbeiten. Dieser spezielle Listener ist in der Esper-Bibliothek enthalten und enthält nur eine einzige Methode. Nachfolgend zeigt eine beispielhafte Implementierung für das Szenario der Ausarbeitung:
 
-\begin{lstlisting}[caption={UpdateListener}\label{updateListener},captionpos=t,language=Java]
+\begin{lstlisting}[caption={UpdateListener}\label{updateListener},captionpos=b,language=Java]
 public class GameActionListener implements UpdateListener {
 
 public void update(EventBean[] newData, EventBean[] oldData) {
@@ -167,9 +164,8 @@ System.out.println("------> Game action: " + event);
 \end{lstlisting}
 
 Der \textbf{UpdateListener}, in der Abbildung GameActionListener genannt, erhält in der Methode \textbf{update(EventBean[] newData, EventBean[] oldData)} die aktuellen Events als ersten und die vorherigen als zweiten Parameter. Dadurch ist es möglich auf Beziehung zwischen Events zu schließen (Kausalität).
-
+\absatz
 Anschließend wird über eine \textbf{System out}-Anweisung die aktuelle Aktion ausgegeben. Sind mehr als 1 Event im ersten Parameter der Methode enthalten, wird nur das erste ausgewertet (Das neuste Element). Die anderen Elemente wurden bereits zuvor abgearbeitet, da der \textbf{UpdateListener}, in diesem Beispiel, auf ein Statement hört, welches ein Length-Window (siehe \ref{LengthWindow}) verwendet, dies ist in der Abbildung nicht dargestellt.
-
+\absatz
 Dies bedeutet auch, dass sich die Logik innerhalb des \textbf{UpdateListener} immer auch auf das gegebene Statement beziehen sollte. Wird z.B. ein Length-Batch-window (siehe \ref{LengthBatchWindow}) verwendet, müssen alle Events verarbeitet werden, wenn der \textbf{UpdateListener} aufgerufen wird, da dies erst geschieht, wenn das Window genau so viele Events wie angegeben enthält. Bei einem Length-Window (siehe \ref{LengthWindow}) muss immer nur das Neuste verarbeitet werden, weil dort der \textbf{UpdateListener} bei jedem Event ausgelöst wird. 
-
 Dies zeigt auch, wie Komplex in Esper die Steuerung der Weiterverarbeitung von Events werden kann. 
