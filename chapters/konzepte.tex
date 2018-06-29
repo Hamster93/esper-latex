@@ -1,15 +1,15 @@
 % !TEX encoding = UTF-8 Unicode
 \chapter{Konzepte}
-Die Konzepte welche Esper verwendet werdet, dienen dazu, den kompletten Ereignisfluss von der Aktion bis zur Verarbeitung und nachfolgenden Aktionen, abzubilden.
+Die Konzepte welche Esper verwendet, dienen dazu, den kompletten Ereignisfluss von der Aktion bis zur Verarbeitung und nachfolgenden Aktionen, abzubilden.
 Ereignisse werden dezentral gefeuert und sind, durch die Registrierung der Ereignistypen auf dem Ereignis-Prozessor, klar definiert. Je nach hinterlegtem Regelwerk, werden diese, von einer Event-Engine, erfasst und verarbeitet oder ignoriert. Zur Regeldefinition dienen Muster, welche als Statements umgesetzt werden. Die Ereignismuster können verschiedene Techniken verwenden, nach denen der Ereignisstrom untersucht wird. 
 Wie die Konfiguration, mit Ereignisdefinition-, Registrierung, sowie das Feuern und Verarbeiten der Ereignisse, in Esper umgesetzt wird, ist in Kapitel \ref{kapitel_architektur} beschrieben.
-Nähere Informationen zu den Konzepten und weitere, hier nicht näher erläuterte Möglichkeiten von Esper, können der Dokumentation \cite{EsperRef2018} entnommen werden.
-Im folgenden werden die Konzepte von Esper erläutert. Anschließend wird jeweils Bezug auf einen Casino-Anwendungsfall genommen und aufgezeigt.
+Nähere Informationen zu den Konzepten und weitere, hier nicht näher erläuterte Möglichkeiten von Esper, können in der Dokumentation \cite{EsperRef2018} nachgelesen werden.
+Im folgenden sind die wichtigsten Konzepte für Einarbeitung in Esper erläutert. Anschließend wird jeweils Bezug auf einen Casino-Anwendungsfall genommen und aufgezeigt (siehe Kapitel \ref{Szenario}).
 
 
 \section{Statements}
 \label{statements}
-Statements dienen dazu Muster zu definieren, mit deren Hilfe die Event-Engine den Datenstrom analysiert. Hierzu existiert die \acf{EPL}, welche stark an den Syntax von SQL erinnert. Diese deklarative Abfragesprache wurde eigens für Esper entwickelt. Mit ihr werden die Ereignismuster definiert und die Ereignisverarbeitung umgesetzt. Der Grundlegende Aufbau eines Statements zeigt Quelltext \ref{structure_select}.
+Statements dienen dazu Muster zu definieren, mit deren Hilfe die Event-Engine den Datenstrom analysiert. Hierzu existiert die \acf{EPL}, welche stark an den Syntax von SQL erinnert. Diese deklarative Abfragesprache wurde eigens für Esper entwickelt. Mit ihr werden die Ereignismuster definiert und die Ereignisverarbeitung umgesetzt. Der Grundlegende Aufbau eines Statements zeigt der nachfolgende Quelltext.
 \begin{lstlisting}[caption={Beispielhafter Aufbau eines Statements }\label{structure_select},captionpos=b,language=SQL]
 
 select playerName 
@@ -25,13 +25,15 @@ Bedingungen können mit \texttt{where} festgelegt werden. So sind Restriktionen 
 
 \section{Select}
 
-Quelltext \ref{basic_select} zeigt ein einfaches Select-Statement. Resultierend hieraus, wird der \acf{EP} auf alle Ereignisse vom Typ \texttt{Action} reagieren und diese bei Eintritt erfassen. 
+Der nachfolgend dargestellte Quelltext zeigt ein einfaches Select-Statement.
 \begin{lstlisting}[caption={Statement einfache Selektion}\label{basic_select},captionpos=b,language=SQL]
 
 select * from GameActionEvent
 
 \end{lstlisting}
-Der Ablauf wird beispielhaft in Abbildung \ref{basic_select_img} grafisch dargestellt. Sie werden unverändert weitergegeben. Dieses Statement wird im dem Casino eingesetzt, um über sämtliche Züge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse feingranular untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
+Dabei wird der \acf{EP} auf alle Ereignisse vom Typ \texttt{GameActionEvent} reagieren und diese bei Eintritt erfassen. 
+
+Der Ablauf wird beispielhaft in Abbildung \ref{basic_select_img} dargestellt. Sie werden unverändert weitergegeben. Dieses Statement wird im dem Casino eingesetzt, um über sämtliche Züge informiert zu werden. Erkennbar ist jedoch nicht, welcher Zug zu welchem Spiel, etc. gehört. Um Ereignisse detaillierter untersuchen zu können, werden weitere Techniken benötigt, welche beispielsweise nach Attributen filtern können.
 \cite{EsperRef2018}[8-9]
 
 \begin{figure}[h]
@@ -43,13 +45,13 @@ Der Ablauf wird beispielhaft in Abbildung \ref{basic_select_img} grafisch darges
 
 \section{Filter}
 
-Die Filterfunktion ist eine geeignete Möglichkeit, die Selektion aus dem Ereignisfluss auf bestimmte Attribut-Werte zu beschränken. Wie das Beispiel in Quelltext \ref{filter_select} veranschaulicht, können, wie im SQL Syntax, Ereigniseigenschaften beschränkt werden.
+Die Filterfunktion ist eine geeignete Möglichkeit, die Selektion aus dem Ereignisfluss auf bestimmte Attribut-Werte zu beschränken. Wie das folgende Beispiel veranschaulicht, können, wie im SQL Syntax, Ereigniseigenschaften beschränkt werden.
 \begin{lstlisting}[caption={Statement mit Filter}\label{filter_select},captionpos=b,language=SQL]
 
 select playerName, deck from GameEndEvent(deck="ROYAL_FLUSH")
 
 \end{lstlisting}
-Wie Quellcode (\ref{filter_select}) zeigt, selektiert die Event-Engine die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent}. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
+Der Quellcode zeigt, wie die Event-Engine die Attribute \texttt{playerName} und \texttt{deck} der auftretenden Ereignisse vom Typ \texttt{GameEndEvent} selektiert. Anschließend wird mit \texttt{GameEndEvent(deck="ROYAL\_FLUSH")} überprüft, ob der Wert des Deck-Attributes im Endevent, einem Royal-Flush entspricht.
 Der Ablauf des Quellcodes wird in Abbildung \ref{filter_select_img} grafisch aufgezeigt. Gut zu sehen, ist, dass nur die End-Events erfasst werden, welche dem Attribut-Wert entsprechen. Weil nur ein Spieler mit einem Royal-Flush-Blatt gewinnt, wird auch nur dieses Ereignis verarbeitet.
 Das Casino benötigt ein solches Statement, um zu erfahren, wer welches Spiel mit welcher Hand gewonnen wird. Um jedoch, einen Spieler mit oftmaligem Glück zu entdecken, ist die Anzahl der Siege erwünscht. Hierfür können die selektierten Daten, mit weiteren Funktionen aggregiert werden.
 \cite{EsperRef2018}[10-11]
